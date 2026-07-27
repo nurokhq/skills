@@ -1,0 +1,39 @@
+name: Bug report
+description: Report incorrect or unsafe behavior in a skill, script, plugin, or repository check.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private KB content, or vulnerability details. Report security issues privately according to SECURITY.md.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - nurok-manage-akb skill
+        - Bundled audit script
+        - Codex plugin or installation
+        - Repository CI or documentation
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe the expected behavior and the observed behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide minimal sanitized steps and inputs.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Include the repository revision, agent client, Nurok CLI, and Python versions when relevant.
+    validations:
+      required: false

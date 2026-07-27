@@ -1,0 +1,32 @@
+name: Skill request or improvement
+description: Propose a new skill or a substantial workflow improvement.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What should a user ask the agent to do, and what outcome should the skill produce?
+    validations:
+      required: true
+  - type: textarea
+    id: current-gap
+    attributes:
+      label: Current gap
+      description: Why are existing agent capabilities or repository skills insufficient?
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and permissions
+      description: Identify required CLIs, APIs, credentials, network access, and local or remote mutations.
+    validations:
+      required: false
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example prompts
+      description: Provide two or three representative user requests without private data.
+    validations:
+      required: false

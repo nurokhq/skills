@@ -1,0 +1,16 @@
+# Default review owner.
+*                                      @nurokhq/engineering
+
+# Governance, security, licensing, and automation.
+/.github/                              @nurokhq/engineering
+/.agents/                              @nurokhq/engineering
+/AGENTS.md                             @nurokhq/engineering
+/CODE_OF_CONDUCT.md                    @nurokhq/engineering
+/CONTRIBUTING.md                       @nurokhq/engineering
+/LICENSE                               @nurokhq/engineering
+/SECURITY.md                           @nurokhq/engineering
+/scripts/                              @nurokhq/engineering
+
+# Executable skill behavior.
+/plugins/nurok-skills/                 @nurokhq/engineering
+/tests/                                @nurokhq/engineering
