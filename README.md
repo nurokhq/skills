@@ -3,63 +3,83 @@
 [![CI](https://github.com/nurokhq/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/nurokhq/skills/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-Nurok Skills packages repeatable agent workflows for building and operating Nurok knowledge bases. Skills follow the [Agent Skills](https://agentskills.io) format and are also distributed as a Codex skill-only plugin.
+Nurok Skills packages repeatable workflows for reading and managing Nurok knowledge bases. Skills follow the [Agent Skills](https://agentskills.io) format and are distributed through independently installable Codex and Claude Code plugins.
 
-## Available Skills
+## Plugins And Skills
 
-| Skill | Purpose |
-| --- | --- |
-| [`nurok-manage-akb`](plugins/nurok-skills/skills/nurok-manage-akb/) | Design, create, validate, publish, update, and recover Nurok OpenAKB knowledge bases. |
+| Plugin | Skill | Purpose |
+| --- | --- | --- |
+| `nurok-kb` | [`nurok-kb`](plugins/nurok-kb/skills/nurok-kb/) | Route and synthesize read-only KB work. |
+| `nurok-kb` | [`nurok-kb-search`](plugins/nurok-kb/skills/nurok-kb-search/) | Search and retrieve sections with evidence. |
+| `nurok-kb` | [`nurok-kb-inspect`](plugins/nurok-kb/skills/nurok-kb-inspect/) | Inspect metadata, revisions, structure, and artifacts. |
+| `nurok-kb-manage` | [`nurok-kb-manage`](plugins/nurok-kb-manage/skills/nurok-kb-manage/) | Design, create, validate, publish, update, and recover KBs. |
+
+Install the read-only and management plugins independently so agents receive only the capabilities needed for a task.
 
 ## Install
 
-### Codex Plugin
+### Codex
 
-Add this repository as a marketplace, then install the plugin:
+Add the repository marketplace, then install either or both plugins:
 
 ```bash
 codex plugin marketplace add nurokhq/skills --ref main
-codex plugin add nurok-skills@nurok
+codex plugin add nurok-kb@nurok
+codex plugin add nurok-kb-manage@nurok
 ```
 
-Start a new Codex thread after installation so the skill is discovered.
+Restart the Codex surface or start a new thread after installation so the skills are discovered.
 
-### Agent Skills Installer
+### Claude Code
 
-Install the skill from the repository with a compatible Agent Skills client:
+Add the repository marketplace, then install either or both plugins:
 
 ```bash
-npx skills add nurokhq/skills --skill nurok-manage-akb
+claude plugin marketplace add nurokhq/skills
+claude plugin install nurok-kb@nurok
+claude plugin install nurok-kb-manage@nurok
 ```
 
-Codex users can also ask `$skill-installer` to install the skill directly from:
+### Portable Agent Skills
 
-```text
-https://github.com/nurokhq/skills/tree/main/plugins/nurok-skills/skills/nurok-manage-akb
+Hermes, OpenClaw, Cursor, and OpenCode can install the canonical skill directories directly. A compatible Agent Skills installer can select an individual skill:
+
+```bash
+npx skills add nurokhq/skills --skill nurok-kb-search
+npx skills add nurokhq/skills --skill nurok-kb-manage
 ```
+
+When installing manually, copy the complete `plugins/<plugin>/skills/<skill>/` directory, including `references/`, `scripts/`, `assets/`, and `agents/` when present. Use a client-supported skill root:
+
+| Client | Supported skill root |
+| --- | --- |
+| Hermes | `~/.hermes/skills/` or a configured external directory |
+| OpenClaw | Workspace `skills/`, `.agents/skills/`, or a configured extra directory |
+| Cursor | `.agents/skills/` or `.cursor/skills/` |
+| OpenCode | `.agents/skills/` or `.opencode/skills/` |
+
+The plugin-local directories are the canonical source. Do not maintain edited per-client copies.
 
 ## Prerequisites
 
-The `nurok-manage-akb` skill requires:
-
-- Nurok CLI 0.2.0 or later;
-- Python 3.9 or later for the bundled supplemental audit;
-- a Nurok login or `NUROK_API_KEY` for authenticated remote operations.
-
-Install the Nurok CLI:
+All skills require the Nurok CLI. The management skill requires Nurok CLI 0.2.0 or later and Python 3.9 or later for its supplemental audit:
 
 ```bash
 curl -fsSL https://static.nurok.ai/cli/install.sh | bash
 ```
 
-Local authoring and the audit script do not require remote credentials. Publishing, pulling private KBs, source-registry changes, visibility changes, and snapshot operations can modify remote state. The skill requires explicit publish authority and endpoint confirmation before those operations.
+Public reads may work anonymously. Private reads and remote management require a Nurok login or `NUROK_API_KEY`. Local authoring and the audit script do not require remote credentials.
+
+The `nurok-kb` plugin does not change remote state. The management plugin can publish, change source registries or visibility, and operate snapshots; its skill requires explicit authority plus endpoint, identity, visibility, and target confirmation before remote mutations.
 
 ## Repository Layout
 
-- `plugins/nurok-skills/` contains the Codex plugin and distributable skills.
+- `plugins/nurok-kb/` contains the read-only plugin and its canonical skills.
+- `plugins/nurok-kb-manage/` contains the lifecycle-management plugin and skill.
+- `.agents/plugins/marketplace.json` publishes the Codex marketplace entries.
+- `.claude-plugin/marketplace.json` publishes the Claude Code marketplace entries.
 - `tests/` contains repository-only tests that are not installed with a skill.
 - `scripts/ci/` contains repository validation and DCO checks.
-- `.agents/plugins/marketplace.json` publishes the Codex marketplace entry.
 
 ## Contributing
 

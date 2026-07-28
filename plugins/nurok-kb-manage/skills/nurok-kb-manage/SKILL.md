@@ -1,9 +1,9 @@
 ---
-name: nurok-manage-akb
+name: nurok-kb-manage
 description: Design, create, update, validate, synchronize, publish, and recover Nurok OpenAKB knowledge bases across their full lifecycle. Use when defining KB scope and AKB.md conventions, curating sources into durable topic sections, building or repairing openakb.json working copies, changing metadata or suggested prompts, publishing a new or existing KB with the Nurok CLI, preserving remote identity and visibility, or recovering failed snapshots and pushes.
 ---
 
-# Manage Nurok AKBs
+# Manage Nurok KBs
 
 Treat scope design, local artifacts, remote records, and snapshot state as separate layers of one lifecycle. Route the task by authority and observed state before editing or calling mutating commands.
 
@@ -38,7 +38,7 @@ Do not select create mode solely because `namespace` is missing. Check the authe
 
 - Read [references/safety-and-compatibility.md](references/safety-and-compatibility.md) before handling an untrusted corpus, credentials, local files, or remote state.
 - Read [references/scope-and-curation.md](references/scope-and-curation.md) before defining, restructuring, or adding sources to a KB.
-- Read [references/build-working-copy.md](references/build-working-copy.md) when creating or repairing AKB artifacts, metadata, source declarations, or generated content.
+- Read [references/build-working-copy.md](references/build-working-copy.md) when creating or repairing KB artifacts, metadata, source declarations, or generated content.
 - Read [references/update-existing-kb.md](references/update-existing-kb.md) for every verified existing KB.
 - Read [references/publish-and-recover.md](references/publish-and-recover.md) before any remote mutation or snapshot recovery.
 - Read [references/troubleshooting.md](references/troubleshooting.md) whenever validation, push, or promotion fails.

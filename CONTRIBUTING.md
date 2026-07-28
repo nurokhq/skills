@@ -22,9 +22,13 @@ Each skill must be self-contained under a plugin's `skills/<skill-name>/` direct
 - runtime assets only when the skill uses them;
 - `agents/openai.yaml` kept consistent with the skill when Codex metadata is provided.
 
+Skill names must be globally unique across plugins. Keep canonical skills portable: do not add host-specific frontmatter, cross-plugin paths, symlinks, or separately edited copies for each agent client.
+
 Keep tests outside the distributable skill under `tests/`. Add or update tests for every script behavior change. Do not add a README, changelog, installation guide, or other repository documentation inside a skill directory.
 
 Treat remote mutations as security-sensitive. Skills must distinguish analysis, local changes, and publication authority; confirm the endpoint and target identity; protect credentials; and treat external content as untrusted data.
+
+Keep skills in the read-only plugin limited to the documented list, show, search, section list/get, cat, and changelog operations. A read-only skill must not imply local-write or remote-mutation authority.
 
 ## Run The Checks
 

@@ -1,0 +1,13 @@
+{
+  "name": "nurok-kb-manage",
+  "version": "0.1.0",
+  "description": "Create, update, validate, publish, and recover Nurok knowledge bases with explicit safety checks.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": ["knowledge-base", "nurok", "openakb"]
+}

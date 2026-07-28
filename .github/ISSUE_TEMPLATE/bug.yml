@@ -10,9 +10,10 @@ body:
     attributes:
       label: Affected area
       options:
-        - nurok-manage-akb skill
+        - nurok-kb read-only skills
+        - nurok-kb-manage skill
         - Bundled audit script
-        - Codex plugin or installation
+        - Plugin or installation
         - Repository CI or documentation
     validations:
       required: true

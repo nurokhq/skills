@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read Nurok KBs"
+  short_description: "Route and synthesize read-only Nurok KB work"
+  default_prompt: "Use $nurok-kb to answer this question from Nurok knowledge bases."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Manage Nurok AKB"
-  short_description: "Design, create, update, and recover Nurok AKBs"
-  default_prompt: "Use $nurok-manage-akb to design, create, update, validate, publish, or recover this Nurok knowledge base."

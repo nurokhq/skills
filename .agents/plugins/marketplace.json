@@ -5,10 +5,22 @@
   },
   "plugins": [
     {
-      "name": "nurok-skills",
+      "name": "nurok-kb",
       "source": {
         "source": "local",
-        "path": "./plugins/nurok-skills"
+        "path": "./plugins/nurok-kb"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "nurok-kb-manage",
+      "source": {
+        "source": "local",
+        "path": "./plugins/nurok-kb-manage"
       },
       "policy": {
         "installation": "AVAILABLE",

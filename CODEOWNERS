@@ -4,6 +4,7 @@
 # Governance, security, licensing, and automation.
 /.github/                              @nurokhq/engineering
 /.agents/                              @nurokhq/engineering
+/.claude-plugin/                       @nurokhq/engineering
 /AGENTS.md                             @nurokhq/engineering
 /CODE_OF_CONDUCT.md                    @nurokhq/engineering
 /CONTRIBUTING.md                       @nurokhq/engineering
@@ -12,5 +13,5 @@
 /scripts/                              @nurokhq/engineering
 
 # Executable skill behavior.
-/plugins/nurok-skills/                 @nurokhq/engineering
+/plugins/                              @nurokhq/engineering
 /tests/                                @nurokhq/engineering

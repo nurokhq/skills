@@ -1,0 +1,4 @@
+interface:
+  display_name: "Inspect Nurok KBs"
+  short_description: "Inspect Nurok KB metadata and revisions"
+  default_prompt: "Use $nurok-kb-inspect to inspect this Nurok KB without changing it."

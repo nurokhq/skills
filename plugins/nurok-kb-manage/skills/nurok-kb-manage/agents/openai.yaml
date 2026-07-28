@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manage Nurok KBs"
+  short_description: "Design, create, update, and recover Nurok KBs"
+  default_prompt: "Use $nurok-kb-manage to design, create, update, validate, publish, or recover this Nurok knowledge base."

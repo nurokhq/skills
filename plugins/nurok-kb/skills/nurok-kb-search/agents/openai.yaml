@@ -1,0 +1,4 @@
+interface:
+  display_name: "Search Nurok KBs"
+  short_description: "Search Nurok KB sections with citations"
+  default_prompt: "Use $nurok-kb-search to find and cite relevant Nurok KB sections."

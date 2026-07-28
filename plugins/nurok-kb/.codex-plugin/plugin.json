@@ -1,0 +1,37 @@
+{
+  "name": "nurok-kb",
+  "version": "0.1.0",
+  "description": "Read, search, inspect, and synthesize Nurok knowledge bases without changing remote state.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai",
+    "url": "https://github.com/nurokhq"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-skills",
+    "knowledge-base",
+    "nurok",
+    "search"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Nurok KB",
+    "shortDescription": "Read and search Nurok knowledge bases",
+    "longDescription": "Search sections, inspect metadata and revisions, retrieve published artifacts, and synthesize answers from Nurok knowledge bases without changing remote state.",
+    "developerName": "Nurok",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "websiteURL": "https://github.com/nurokhq/skills",
+    "defaultPrompt": [
+      "Answer a question from a Nurok knowledge base.",
+      "Search a Nurok KB and cite the relevant sections.",
+      "Inspect a Nurok KB's metadata and revision history."
+    ]
+  }
+}

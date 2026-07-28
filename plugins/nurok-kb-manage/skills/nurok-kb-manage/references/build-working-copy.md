@@ -1,6 +1,6 @@
 # Build Or Repair A Working Copy
 
-Read this reference when creating `openakb.json`, repairing AKB artifacts, or changing metadata, sections, sources, content, or generation logic.
+Read this reference when creating `openakb.json`, repairing KB artifacts, or changing metadata, sections, sources, content, or generation logic.
 
 ## Scaffold A New Working Copy
 

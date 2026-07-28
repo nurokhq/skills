@@ -10,9 +10,9 @@ from pathlib import Path
 AUDIT_SCRIPT = (
     Path(__file__).resolve().parents[2]
     / "plugins"
-    / "nurok-skills"
+    / "nurok-kb-manage"
     / "skills"
-    / "nurok-manage-akb"
+    / "nurok-kb-manage"
     / "scripts"
     / "audit_working_copy.py"
 )
