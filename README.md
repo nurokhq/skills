@@ -9,9 +9,7 @@ Nurok Skills packages repeatable workflows for reading and managing Nurok knowle
 
 | Plugin | Skill | Purpose |
 | --- | --- | --- |
-| `nurok-kb` | [`nurok-kb`](plugins/nurok-kb/skills/nurok-kb/) | Route and synthesize read-only KB work. |
-| `nurok-kb` | [`nurok-kb-search`](plugins/nurok-kb/skills/nurok-kb-search/) | Search and retrieve sections with evidence. |
-| `nurok-kb` | [`nurok-kb-inspect`](plugins/nurok-kb/skills/nurok-kb-inspect/) | Inspect metadata, revisions, structure, and artifacts. |
+| `nurok-kb` | [`nurok-kb`](plugins/nurok-kb/skills/nurok-kb/) | Read, search, inspect, and synthesize KB evidence. |
 | `nurok-kb-manage` | [`nurok-kb-manage`](plugins/nurok-kb-manage/skills/nurok-kb-manage/) | Design, create, validate, publish, update, and recover KBs. |
 
 Install the read-only and management plugins independently so agents receive only the capabilities needed for a task.
@@ -45,7 +43,7 @@ claude plugin install nurok-kb-manage@nurok
 Hermes, OpenClaw, Cursor, and OpenCode can install the canonical skill directories directly. A compatible Agent Skills installer can select an individual skill:
 
 ```bash
-npx skills add nurokhq/skills --skill nurok-kb-search
+npx skills add nurokhq/skills --skill nurok-kb
 npx skills add nurokhq/skills --skill nurok-kb-manage
 ```
 

@@ -21,7 +21,7 @@ MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 NUROK_KB_COMMAND_PATTERN = re.compile(r"\bnurok\s+kb\s+([a-z]+)(?:\s+([a-z]+))?")
 LOCAL_OUTPUT_PATTERN = re.compile(r"(?<![\w-])--out(?:\s|=|`)")
 EXPECTED_PLUGIN_SKILLS = {
-    "nurok-kb": {"nurok-kb", "nurok-kb-inspect", "nurok-kb-search"},
+    "nurok-kb": {"nurok-kb"},
     "nurok-kb-manage": {"nurok-kb-manage"},
 }
 READ_ONLY_COMMANDS = {

@@ -19,7 +19,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Nurok KB",
-    "shortDescription": "Read and search Nurok knowledge bases",
+    "shortDescription": "Search and inspect Nurok knowledge bases",
     "longDescription": "Search sections, inspect metadata and revisions, retrieve published artifacts, and synthesize answers from Nurok knowledge bases without changing remote state.",
     "developerName": "Nurok",
     "category": "Developer Tools",
