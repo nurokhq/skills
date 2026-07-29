@@ -3,7 +3,7 @@
 [![CI](https://github.com/nurokhq/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/nurokhq/skills/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-Nurok Skills packages repeatable workflows for reading and managing Nurok knowledge bases. Skills follow the [Agent Skills](https://agentskills.io) format and are distributed through independently installable Codex and Claude Code plugins.
+Nurok Skills packages repeatable workflows for reading and managing Nurok knowledge bases. Skills follow the [Agent Skills](https://agentskills.io) format and are distributed through independently installable Codex and Claude Code plugins plus portable packages for Cursor, OpenCode, and other compatible agents.
 
 ## Plugins And Skills
 
@@ -38,16 +38,39 @@ claude plugin install nurok-kb@nurok
 claude plugin install nurok-kb-manage@nurok
 ```
 
-### Portable Agent Skills
+Restart Claude Code or start a new session after installation so the skills are discovered.
 
-Hermes, OpenClaw, Cursor, and OpenCode can install the canonical skill directories directly. A compatible Agent Skills installer can select an individual skill:
+### Cursor
+
+Install either skill into Cursor with the open Agent Skills installer:
 
 ```bash
-npx skills add nurokhq/skills --skill nurok-kb
-npx skills add nurokhq/skills --skill nurok-kb-manage
+npx skills add nurokhq/skills --skill nurok-kb --agent cursor --yes
+npx skills add nurokhq/skills --skill nurok-kb-manage --agent cursor --yes
 ```
 
-When installing manually, copy the complete `plugins/<plugin>/skills/<skill>/` directory, including `references/`, `scripts/`, `assets/`, and `agents/` when present. Use a client-supported skill root:
+Project installs use Cursor's supported `.agents/skills/` location. Start a new Agent chat after installation.
+
+### OpenCode
+
+Install either skill into OpenCode with the same canonical packages:
+
+```bash
+npx skills add nurokhq/skills --skill nurok-kb --agent opencode --yes
+npx skills add nurokhq/skills --skill nurok-kb-manage --agent opencode --yes
+```
+
+Project installs use OpenCode's supported `.agents/skills/` location. Start a new session after installation.
+
+### Other Agent Skill Clients
+
+Inspect the portable skills before installing them into another compatible client:
+
+```bash
+npx skills add nurokhq/skills --list
+```
+
+Hermes and OpenClaw can also load canonical skill directories through their native Git, registry, or external-directory mechanisms. When installing manually, copy the complete `plugins/<plugin>/skills/<skill>/` directory, including `references/`, `scripts/`, `assets/`, and `agents/` when present. Use a client-supported skill root:
 
 | Client | Supported skill root |
 | --- | --- |
