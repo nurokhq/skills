@@ -3,7 +3,7 @@
 [![CI](https://github.com/nurokhq/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/nurokhq/skills/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-Nurok Skills packages repeatable workflows for reading and managing Nurok knowledge bases. Skills follow the [Agent Skills](https://agentskills.io) format and are distributed through independently installable Codex and Claude Code plugins plus portable packages for Cursor, OpenCode, and other compatible agents.
+Nurok Skills packages repeatable workflows for reading and managing Nurok knowledge bases. Skills follow the [Agent Skills](https://agentskills.io) format and are distributed through independently installable Codex and Claude Code plugins plus portable packages for Hermes, OpenClaw, Cursor, OpenCode, and other compatible agents.
 
 ## Plugins And Skills
 
@@ -16,9 +16,13 @@ Install the read-only and management plugins independently so agents receive onl
 
 ## Install
 
-### Codex
+### Direct Installation
 
-Add the repository marketplace, then install either or both plugins:
+Use a client's native installer when it supports this repository layout. These commands are client-specific and do not use the portable Skills CLI.
+
+#### Codex
+
+Add the Codex marketplace, then install either or both plugins:
 
 ```bash
 codex plugin marketplace add nurokhq/skills --ref main
@@ -26,11 +30,11 @@ codex plugin add nurok-kb@nurok
 codex plugin add nurok-kb-manage@nurok
 ```
 
-Restart the Codex surface or start a new thread after installation so the skills are discovered.
+Restart the Codex surface or start a new thread after installation.
 
-### Claude Code
+#### Claude Code
 
-Add the repository marketplace, then install either or both plugins:
+Add the Claude Code marketplace, then install either or both plugins:
 
 ```bash
 claude plugin marketplace add nurokhq/skills
@@ -38,48 +42,61 @@ claude plugin install nurok-kb@nurok
 claude plugin install nurok-kb-manage@nurok
 ```
 
-Restart Claude Code or start a new session after installation so the skills are discovered.
+Claude Code follows the repository's default branch. Restart Claude Code or start a new session after installation.
 
-### Cursor
+#### Hermes
 
-Install either skill into Cursor with the open Agent Skills installer:
+Hermes can install either canonical skill directory directly from GitHub:
+
+```bash
+hermes skills install nurokhq/skills/plugins/nurok-kb/skills/nurok-kb
+hermes skills install nurokhq/skills/plugins/nurok-kb-manage/skills/nurok-kb-manage
+```
+
+These commands follow the repository's default branch and install into Hermes' managed skills directory. Use the Skills CLI method below when a branch or release tag must be explicit.
+
+### Install with the Skills CLI
+
+Use the open [Skills CLI](https://github.com/vercel-labs/skills) for one portable installation flow across Hermes, OpenClaw, Cursor, and OpenCode. This installs Agent Skills rather than Codex or Claude Code plugins.
+
+Choose the target agent and scope:
+
+| Client | `--agent` value | Recommended scope option | Expected target |
+| --- | --- | --- | --- |
+| Hermes | `hermes-agent` | `--global` | `~/.hermes/skills/` |
+| OpenClaw | `openclaw` | None | `<project>/skills/` |
+| Cursor | `cursor` | None | `<project>/.agents/skills/` |
+| OpenCode | `opencode` | None | `<project>/.agents/skills/` |
+
+The following examples target Cursor. Replace `cursor` with the required `--agent` value, and add `--global` for the recommended Hermes installation.
+
+Use the simplified GitHub source to follow the repository's default branch:
 
 ```bash
 npx skills add nurokhq/skills --skill nurok-kb --agent cursor --yes
 npx skills add nurokhq/skills --skill nurok-kb-manage --agent cursor --yes
 ```
 
-Project installs use Cursor's supported `.agents/skills/` location. Start a new Agent chat after installation.
-
-### OpenCode
-
-Install either skill into OpenCode with the same canonical packages:
+Use full GitHub `tree` URLs to pin a branch or release tag:
 
 ```bash
-npx skills add nurokhq/skills --skill nurok-kb --agent opencode --yes
-npx skills add nurokhq/skills --skill nurok-kb-manage --agent opencode --yes
+npx skills add https://github.com/nurokhq/skills/tree/main/plugins/nurok-kb/skills/nurok-kb --agent cursor --yes
+npx skills add https://github.com/nurokhq/skills/tree/main/plugins/nurok-kb-manage/skills/nurok-kb-manage --agent cursor --yes
 ```
 
-Project installs use OpenCode's supported `.agents/skills/` location. Start a new session after installation.
+The Skills CLI does not have a `--ref` option. Replace `main` in the `tree` URLs with the required branch name or release tag when an exact revision is needed. Do not use the `owner/repo@ref` form for a Git ref because the `@` suffix can select a skill.
 
-### Other Agent Skill Clients
-
-Inspect the portable skills before installing them into another compatible client:
+List the skills available from the repository before installation:
 
 ```bash
 npx skills add nurokhq/skills --list
 ```
 
-Hermes and OpenClaw can also load canonical skill directories through their native Git, registry, or external-directory mechanisms. When installing manually, copy the complete `plugins/<plugin>/skills/<skill>/` directory, including `references/`, `scripts/`, `assets/`, and `agents/` when present. Use a client-supported skill root:
+After installation, verify that the expected target contains the complete skill directory and its `SKILL.md`; current Skills CLI versions may include other detected clients in `skills list --agent` output. Start a new client session so it discovers the installed skills.
 
-| Client | Supported skill root |
-| --- | --- |
-| Hermes | `~/.hermes/skills/` or a configured external directory |
-| OpenClaw | Workspace `skills/`, `.agents/skills/`, or a configured extra directory |
-| Cursor | `.agents/skills/` or `.cursor/skills/` |
-| OpenCode | `.agents/skills/` or `.opencode/skills/` |
+OpenClaw's native Git installer requires `SKILL.md` at the Git source root, which does not match this multi-plugin repository. Use the Skills CLI for OpenClaw unless the skills are published separately through ClawHub. Cursor provides a GitHub import UI but no equivalent native installation command, and OpenCode does not document a native skill installation command.
 
-The plugin-local directories are the canonical source. Do not maintain edited per-client copies.
+The plugin-local directories remain the canonical source. Do not commit generated client-specific copies.
 
 ## Prerequisites
 
