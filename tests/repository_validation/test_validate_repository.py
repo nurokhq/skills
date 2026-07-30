@@ -12,6 +12,7 @@ VALIDATOR_PATH = (
 validator = runpy.run_path(str(VALIDATOR_PATH))
 validate_read_only_skill = validator["validate_read_only_skill"]
 validate_skill_links = validator["validate_skill_links"]
+validate_portable_skill_markdown = validator["validate_portable_skill_markdown"]
 
 
 class RepositoryValidationTests(unittest.TestCase):
@@ -67,6 +68,30 @@ class RepositoryValidationTests(unittest.TestCase):
             validate_skill_links(skill_root, errors)
 
         self.assertTrue(any("link escapes the skill root" in error for error in errors))
+
+    def test_host_specific_skill_mention_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            skill_root = self.write_skill(
+                Path(directory),
+                "Route the request to `$nurok-kb-manage`.\n",
+            )
+            errors: list[str] = []
+
+            validate_portable_skill_markdown(skill_root, errors)
+
+        self.assertTrue(any("host-specific mention" in error for error in errors))
+
+    def test_host_neutral_skill_name_and_schema_variable_are_allowed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            skill_root = self.write_skill(
+                Path(directory),
+                "Use `nurok-kb-manage` when available and preserve `$schema`.\n",
+            )
+            errors: list[str] = []
+
+            validate_portable_skill_markdown(skill_root, errors)
+
+        self.assertEqual(errors, [])
 
 
 if __name__ == "__main__":

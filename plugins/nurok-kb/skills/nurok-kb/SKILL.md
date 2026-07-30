@@ -84,4 +84,4 @@ Use only these command families:
 - `nurok kb cat`
 - `nurok kb changelog`
 
-Default `nurok kb cat` to stdout. Use its local output-directory option only when the user explicitly authorizes local file creation and the destination is inside the authorized working root. If the request requires changing local KB artifacts or remote state, stop and route it to `$nurok-kb-manage`.
+Default `nurok kb cat` to stdout. Use its local output-directory option only when the user explicitly authorizes local file creation and the destination is inside the authorized working root. If the request requires changing local KB artifacts or remote state, stop and explain that this skill is read-only. Hand off the request only when a separately installed `nurok-kb-manage` capability is available; otherwise tell the user that it must be installed or enabled.

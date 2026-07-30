@@ -17,7 +17,8 @@ This repository publishes portable Nurok Agent Skills through independent Codex 
 - Write concise imperative instructions and link every conditional reference directly from `SKILL.md`.
 - Put deterministic runtime helpers in `scripts/`, on-demand guidance in `references/`, and output resources in `assets/`.
 - Keep product-specific UI metadata in `agents/` and regenerate it when the skill's purpose changes.
-- Keep host-specific plugin metadata outside canonical `SKILL.md` frontmatter.
+- Keep host-specific plugin metadata outside canonical `SKILL.md` frontmatter, and keep host-specific invocation syntax such as `$skill` out of canonical skill instructions.
+- Describe separately installed capabilities conditionally; never assume another plugin is available.
 - Keep every skill name globally unique across plugins.
 - Keep skill references, scripts, and assets inside the owning skill; do not use cross-plugin relative paths or symlinks.
 - Do not add repository documentation, changelogs, tests, or placeholders inside a distributable skill.

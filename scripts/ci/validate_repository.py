@@ -24,6 +24,16 @@ EXPECTED_PLUGIN_SKILLS = {
     "nurok-kb": {"nurok-kb"},
     "nurok-kb-manage": {"nurok-kb-manage"},
 }
+KNOWN_SKILL_NAMES = frozenset(
+    skill_name
+    for skill_names in EXPECTED_PLUGIN_SKILLS.values()
+    for skill_name in skill_names
+)
+HOST_SKILL_MENTION_PATTERN = re.compile(
+    r"(?<![\w-])\$("
+    + "|".join(re.escape(name) for name in sorted(KNOWN_SKILL_NAMES, reverse=True))
+    + r")(?![\w-])"
+)
 READ_ONLY_COMMANDS = {
     ("cat", None),
     ("changelog", None),
@@ -124,6 +134,23 @@ def validate_skill_links(skill_root: Path, errors: list[str]) -> None:
                 errors.append(f"{relative(path)}: broken relative link: {target}")
 
 
+def validate_portable_skill_markdown(skill_root: Path, errors: list[str]) -> None:
+    paths = [skill_root / "SKILL.md", *sorted((skill_root / "references").glob("*.md"))]
+    for path in paths:
+        if not path.is_file():
+            continue
+        try:
+            contents = path.read_text(encoding="utf-8")
+        except OSError as error:
+            errors.append(f"{relative(path)}: {error}")
+            continue
+        for match in HOST_SKILL_MENTION_PATTERN.finditer(contents):
+            errors.append(
+                f"{relative(path)}: canonical skill instructions use host-specific "
+                f"mention ${match.group(1)}"
+            )
+
+
 def validate_read_only_skill(skill_root: Path, errors: list[str]) -> None:
     for path in sorted(skill_root.rglob("*")):
         if not path.is_file() or path.suffix.lower() not in {
@@ -194,6 +221,7 @@ def validate_skill(
         errors.append(f"{relative(path)}: description must be 1-1024 characters")
     validate_agent_yaml(skill_root, name, errors)
     validate_skill_links(skill_root, errors)
+    validate_portable_skill_markdown(skill_root, errors)
     if any((skill_root / "scripts").glob("test_*.py")):
         errors.append(f"{relative(skill_root)}: keep tests under repository tests/")
     if plugin_name == "nurok-kb":
