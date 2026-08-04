@@ -98,6 +98,42 @@ OpenClaw's native Git installer requires `SKILL.md` at the Git source root, whic
 
 The plugin-local directories remain the canonical source. Do not commit generated client-specific copies.
 
+## Upgrade
+
+After a skill update is published to the branch or release you installed, upgrade it with the same installation method.
+
+For Codex, refresh the marketplace snapshot and reinstall each installed plugin:
+
+```bash
+codex plugin marketplace upgrade nurok
+codex plugin add nurok-kb@nurok
+codex plugin add nurok-kb-manage@nurok
+```
+
+For Claude Code, update the marketplace and each installed plugin:
+
+```bash
+claude plugin marketplace update nurok
+claude plugin update nurok-kb@nurok
+claude plugin update nurok-kb-manage@nurok
+```
+
+For a native Hermes installation, check for and apply upstream changes:
+
+```bash
+hermes skills check
+hermes skills update nurok-kb
+hermes skills update nurok-kb-manage
+```
+
+For a portable Skills CLI installation, update the tracked skills in the current scope:
+
+```bash
+npx skills update nurok-kb nurok-kb-manage
+```
+
+Use `--global` or `--project` to select the original Skills CLI installation scope. Only run the commands for plugins or skills you installed, then restart the client or start a new session so it loads the updated instructions.
+
 ## Prerequisites
 
 All skills require the Nurok CLI. The management skill requires Nurok CLI 0.2.0 or later and Python 3.9 or later for its supplemental audit:
