@@ -62,6 +62,7 @@ Do not select create mode solely because `namespace` is missing. Check the authe
 - Keep source pointer visibility independent from KB record visibility. Public evidence does not make the KB public.
 - Keep `AKB.md` as the KB-specific scope, inclusion, evidence, taxonomy, and update convention.
 - Change generated sources of truth rather than patching generated JSON alone.
+- Keep descriptor identity separate from CLI addressing: `id` is required and `namespace` is optional, and each is one `[a-z0-9_-]` segment of at most 64 characters; `--kb <owner>/<slug>` is a Nurok CLI address, so never copy it into `namespace`.
 - Never lose or overwrite a verified namespace, remote binding, revision baseline, or resumable draft.
 - Never bypass validation to make a routine publication succeed.
 - Never publish crawler code, raw archives, caches, tests, or unrelated documentation as KB artifacts.
