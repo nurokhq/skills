@@ -22,6 +22,7 @@ NUROK_KB_COMMAND_PATTERN = re.compile(r"\bnurok\s+kb\s+([a-z]+)(?:\s+([a-z]+))?"
 LOCAL_OUTPUT_PATTERN = re.compile(r"(?<![\w-])--out(?:\s|=|`)")
 EXPECTED_PLUGIN_SKILLS = {
     "nurok-kb": {"nurok-kb"},
+    "nurok-kb-capture": {"nurok-kb-capture"},
     "nurok-kb-manage": {"nurok-kb-manage"},
 }
 KNOWN_SKILL_NAMES = frozenset(
@@ -462,6 +463,12 @@ def validate_claude_marketplace(plugin_names: set[str], errors: list[str]) -> No
         ):
             errors.append(
                 f"{relative(CLAUDE_MARKETPLACE_PATH)}: invalid source for {name}"
+            )
+        expected_skills = [f"./skills/{name}"]
+        if entry.get("skills") != expected_skills:
+            errors.append(
+                f"{relative(CLAUDE_MARKETPLACE_PATH)}: expected skills "
+                f"{expected_skills} for {name}"
             )
     if entry_names != plugin_names:
         errors.append(

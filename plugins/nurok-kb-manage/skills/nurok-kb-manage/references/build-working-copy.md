@@ -46,7 +46,7 @@ Define four to eight ordered prompts. Make each answerable from the corpus, natu
 - Omit `parent_id` from root categories. Keep child relationships valid and intentional.
 - Give every content section at least one valid `source_ids` citation.
 - Use `sections/<section-id>/content.md` for hosted Markdown content.
-- Add truthful RFC 3339 `captured_at` values to every non-redacted source.
+- Copy a truthful RFC 3339 `captured_at` from each non-redacted source's successful persisted capture; never substitute discovery, attempt, or build time.
 - Use supported Nurok source types: `feed`, `file`, `firsthand`, `redacted`, or `url`.
 - Use `feed` plus `discovered_via_id` when a feed or listing discovered content.
 - Deduplicate by the source natural key, normally source type plus canonical URI.

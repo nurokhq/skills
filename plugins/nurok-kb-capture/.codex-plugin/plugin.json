@@ -1,0 +1,39 @@
+{
+  "name": "nurok-kb-capture",
+  "version": "0.1.0",
+  "description": "Capture, refresh, and assess source evidence for Nurok knowledge bases.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai",
+    "url": "https://github.com/nurokhq"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-skills",
+    "capture",
+    "knowledge-base",
+    "nurok",
+    "provenance"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Nurok KB Capture",
+    "shortDescription": "Capture traceable KB source evidence",
+    "longDescription": "Collect, preserve, refresh, and assess source evidence for Nurok knowledge bases without prescribing a capture method or publishing KB revisions.",
+    "developerName": "Nurok",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Network",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/nurokhq/skills",
+    "defaultPrompt": [
+      "Capture source evidence for a Nurok knowledge base.",
+      "Refresh KB source evidence with the available tools.",
+      "Assess whether existing KB source evidence is traceable."
+    ]
+  }
+}

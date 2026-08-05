@@ -1,0 +1,4 @@
+interface:
+  display_name: "Capture Nurok KB Sources"
+  short_description: "Capture traceable Nurok KB source evidence"
+  default_prompt: "Use $nurok-kb-capture to collect or refresh traceable source evidence for this Nurok knowledge base."

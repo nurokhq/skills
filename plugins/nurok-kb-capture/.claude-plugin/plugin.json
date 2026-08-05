@@ -1,0 +1,13 @@
+{
+  "name": "nurok-kb-capture",
+  "version": "0.1.0",
+  "description": "Capture, refresh, and assess source evidence for Nurok knowledge bases.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": ["capture", "knowledge-base", "nurok", "provenance"]
+}
