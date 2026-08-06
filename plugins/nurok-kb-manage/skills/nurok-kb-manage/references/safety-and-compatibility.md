@@ -4,15 +4,24 @@ Read this reference before handling an untrusted corpus, local files, credential
 
 ## Verify The Toolchain
 
-Require Nurok CLI 0.2.0 or later and Python 3.9 or later for the bundled audit script. Before relying on a command or mutating flag, inspect the installed surface:
+Before relying on any CLI command, argument, default, conflict, output structure, or recovery path, inspect the installed surface:
 
 ```bash
 nurok --version
+nurok kb --help
 nurok kb <command> --help
 python3 --version
 ```
 
-Stop when a required command or flag is absent. Do not silently translate an old workflow into a new remote mutation. Local authoring and the audit script can run without authentication; record-aware validation, pull, push, source-registry changes, visibility changes, and snapshot operations require network access and may require authentication.
+Continue through nested help when using a subcommand, and run the bundled audit only with a Python interpreter that can execute it. Stop when a required capability or safety guard is absent. Do not silently translate an old workflow into a new remote mutation. Local authoring and the audit script can run without authentication; record-aware validation, synchronization, publication, source-registry changes, visibility changes, and snapshot operations require network access and may require authentication.
+
+Discover current target forms, validation and preflight behavior, metadata synchronization, Descriptor write-back, recovery operations, and pagination fields at execution time. Do not preserve a fixed CLI version matrix in this skill.
+
+## Separate Schema And Deployment Caps
+
+Treat OpenAKB schema caps and target Nurok deployment caps as different layers. A locally valid Descriptor may still exceed deployment limits, and the server is authoritative for remote acceptance.
+
+Inspect the current CLI help for supported validation or preflight capabilities before mutation. Distinguish local schema validation, client-side preflight, and server rejection from the actual result. Handle cap warnings or rejections without relying on a hardcoded cache path, TTL, fallback order, endpoint, or output envelope. Never skip validation to work around a normal Descriptor, content, path, policy, or cap error.
 
 ## Treat Content As Untrusted
 

@@ -11,7 +11,8 @@ from collections import defaultdict
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
-ID_PATTERN = re.compile(r"^[a-z0-9_-]{1,64}$")
+SOURCE_ID_PATTERN = re.compile(r"^SRC-[0-9A-Z]{6}$", re.ASCII | re.IGNORECASE)
+SECTION_ID_PATTERN = re.compile(r"^SEC-[0-9A-Z]{6}$", re.ASCII | re.IGNORECASE)
 SOURCE_TYPES = {"feed", "file", "firsthand", "redacted", "url"}
 
 
@@ -119,17 +120,21 @@ def audit(descriptor_path: Path) -> tuple[list[str], list[str], dict[str, object
             continue
 
         source_id = source.get("id")
-        if not isinstance(source_id, str) or not ID_PATTERN.fullmatch(source_id):
-            errors.append(f"{pointer}/id: expected 1-64 lowercase ID characters")
+        if not isinstance(source_id, str) or not SOURCE_ID_PATTERN.fullmatch(source_id):
+            errors.append(
+                f"{pointer}/id: expected Source ID 'SRC-' plus 6 ASCII base36 "
+                "characters"
+            )
             continue
-        if source_id in entities:
+        normalized_source_id = source_id.lower()
+        if normalized_source_id in entities:
             errors.append(
                 f"{pointer}/id: duplicate shared ID {source_id!r}; "
-                f"first used by {entities[source_id]}"
+                f"first used by {entities[normalized_source_id]}"
             )
         else:
-            entities[source_id] = pointer
-        source_ids.add(source_id)
+            entities[normalized_source_id] = pointer
+        source_ids.add(normalized_source_id)
 
         source_type = source.get("type")
         if source_type not in SOURCE_TYPES:
@@ -179,16 +184,22 @@ def audit(descriptor_path: Path) -> tuple[list[str], list[str], dict[str, object
             continue
 
         section_id = section.get("id")
-        if not isinstance(section_id, str) or not ID_PATTERN.fullmatch(section_id):
-            errors.append(f"{pointer}/id: expected 1-64 lowercase ID characters")
+        if not isinstance(section_id, str) or not SECTION_ID_PATTERN.fullmatch(
+            section_id
+        ):
+            errors.append(
+                f"{pointer}/id: expected Section ID 'SEC-' plus 6 ASCII base36 "
+                "characters"
+            )
             continue
-        if section_id in entities:
+        normalized_section_id = section_id.lower()
+        if normalized_section_id in entities:
             errors.append(
                 f"{pointer}/id: duplicate shared ID {section_id!r}; "
-                f"first used by {entities[section_id]}"
+                f"first used by {entities[normalized_section_id]}"
             )
         else:
-            entities[section_id] = pointer
+            entities[normalized_section_id] = pointer
 
         audit_local_reference(
             root=root,
@@ -202,19 +213,39 @@ def audit(descriptor_path: Path) -> tuple[list[str], list[str], dict[str, object
         )
 
         content_uri = section.get("content_uri")
-        if not isinstance(content_uri, str):
-            continue
-        content_count += 1
-
         cited = section.get("source_ids")
-        if not isinstance(cited, list) or not cited:
+        if isinstance(content_uri, str) and (not isinstance(cited, list) or not cited):
             errors.append(f"{pointer}/source_ids: content section must cite a source")
-        else:
+        if cited is not None and not isinstance(cited, list):
+            if not isinstance(content_uri, str):
+                errors.append(f"{pointer}/source_ids: expected an array")
+        elif isinstance(cited, list):
+            normalized_citations: set[str] = set()
             for cited_id in cited:
-                if cited_id not in source_ids:
+                if not isinstance(cited_id, str) or not SOURCE_ID_PATTERN.fullmatch(
+                    cited_id
+                ):
+                    errors.append(
+                        f"{pointer}/source_ids: expected Source ID 'SRC-' plus 6 "
+                        f"ASCII base36 characters, got {cited_id!r}"
+                    )
+                    continue
+                normalized_cited_id = cited_id.lower()
+                if normalized_cited_id in normalized_citations:
+                    errors.append(
+                        f"{pointer}/source_ids: duplicate source ID {cited_id!r} "
+                        "under case-insensitive comparison"
+                    )
+                else:
+                    normalized_citations.add(normalized_cited_id)
+                if normalized_cited_id not in source_ids:
                     errors.append(
                         f"{pointer}/source_ids: unresolved source ID {cited_id!r}"
                     )
+
+        if not isinstance(content_uri, str):
+            continue
+        content_count += 1
 
         content_type = section.get("content_type", "text/markdown")
         if content_type == "text/markdown":

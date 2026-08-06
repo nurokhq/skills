@@ -1,64 +1,64 @@
 # Nurok OpenAKB Troubleshooting
 
-Read this reference when `nurok kb validate`, `nurok kb push`, or snapshot promotion fails.
+Read this reference when validation, publication, metadata synchronization, or snapshot recovery fails.
 
-## Failure Matrix
+## Re-Discover The Failed Command
+
+Record the installed version and inspect help for the failed command and each nested lifecycle command:
+
+```bash
+nurok --version
+nurok kb --help
+nurok kb <command> --help
+```
+
+Use the actual result to identify current flags, conflicts, output fields, recovery hints, and state transitions. Do not apply a flag sequence or default behavior remembered from another CLI version.
+
+## Diagnose Stable Validation Signals
 
 | Signal | Likely cause | Action |
 | --- | --- | --- |
-| `AKB001` | Duplicate ID across source and section objects | Mint stable unique IDs in the shared namespace. |
+| `AKB001` | Duplicate typed ID under case-insensitive comparison | Preserve one stable identity and mint a valid unique typed ID for the other entity. |
 | `AKB002` | Section has neither content nor children | Add `content_uri` or at least one child. |
-| `AKB003` | Content section has no source citation | Add non-empty `source_ids` referencing declared sources. |
-| `AKB007` | Parent, source, discovery, citation, or local-link reference does not resolve | Correct the reference kind and target. |
-| `AKB011` | Invalid ID, timestamp, URI, hash, language, or type | Fix the exact pointer; do not suppress validation. |
-| `NUROK009: hosted URI is not the canonical path` | Content is outside Nurok's hosted layout | For Markdown, use `sections/<section-id>/content.md` and materialize it. |
-| `NUROK015: captured_at is required` | Platform policy requires a capture time | Add a truthful RFC 3339 value to each non-redacted source. |
-| `NUROK014` | Source type or pointer visibility is outside Nurok's vocabulary | Use a supported source type and visibility. |
-| `NUROK007: natural key conflicts with another source` | Sources share a type plus URI | Deduplicate the corpus, rebuild, validate, and publish a corrected snapshot. |
-| `cli.kb.manifest_unresolvable` | A local file is unsafe, outside the root, or missing without complete stamps | Materialize the file or correct the relative URI. |
-| `cli.kb.push_no_create` | An unbound copy was pushed with `--no-create` | Remove the flag only for authorized creation, or resolve the existing target. |
-| `conflict.already_exists` during implicit create | The owner already has the slug but the copy is unbound | Resolve and verify the existing KB instead of creating again. |
-| `dependency.timeout` after uploads | Finalize or indexing exceeded a gateway deadline | Inspect the named draft and resume only when retry is safe. |
-| Push fails after `--sync-metadata` | Record metadata may have changed before snapshot creation or promotion failed | Re-read the KB record, compare the saved baseline, and report or explicitly revert the partial change. |
+| `AKB003` | Content section has no Source citation | Add non-empty `source_ids` containing declared `SRC-` IDs. |
+| `AKB004` | Section parent graph contains a cycle | Repair `parent_id` edges without changing unrelated stable IDs. |
+| `AKB007` | A local typed reference does not resolve | Correct the target while preserving Source-versus-Section kind. |
+| `AKB010` | A reference uses `SEC-` where a Source is required or `SRC-` where a Section is required | Replace it with an ID of the required entity kind. |
+| `AKB011` | Invalid typed ID, slug, timestamp, URI, hash, language, type, or case-insensitive array uniqueness | Fix the exact pointer; do not suppress validation. |
+| Hosted Markdown path is not canonical | Content is outside Nurok's hosted layout | Use `sections/<section-id>/content.md` and materialize it. |
+| Capture time is required | A non-redacted Source lacks persisted-capture time | Add a truthful RFC 3339 `captured_at`; do not use discovery or attempt time. |
+| Source natural key conflicts | Sources share a type plus canonical URI | Deduplicate the corpus, preserve the intended Source ID, rebuild, and validate. |
+| Local manifest or payload cannot resolve | A local file is unsafe, outside the root, missing, or lacks complete stamps | Materialize the file or correct the relative URI without traversing outside the working copy. |
+| Target already exists during creation | The intended remote KB exists but the Descriptor is unbound | Resolve and verify the existing KB instead of creating again. |
+| Timeout after upload or lifecycle mutation | The server may have advanced state after the client stopped waiting | Re-read the record and snapshot before any retry. |
+| Publication fails after metadata work | Record metadata may have changed independently of snapshot state | Compare both saved baselines with current remote state before retry or revert. |
 | Authentication I/O error in a sandbox | Credential storage is outside allowed access | Request narrowly scoped permission for Nurok credentials. |
 
-## Canonical Working-Copy Rules
+## Apply Canonical Working-Copy Rules
 
-- Use `sections/<section-id>/content.md` for Markdown.
-- Give every non-redacted source a recognized type and RFC 3339 `captured_at`.
+- Use typed Source IDs (`SRC-` plus six ASCII base36 characters) and Section IDs (`SEC-` plus six ASCII base36 characters); resolve and deduplicate them case-insensitively.
+- Use `sections/<section-id>/content.md` for Nurok-hosted Markdown.
+- Give every non-redacted Source a recognized type and truthful RFC 3339 `captured_at`.
 - Keep relative paths canonical, inside the working copy, and symlink-safe.
-- Remember that local files override declared stamps because push re-derives their hashes.
-- Treat stamps-only missing files as partial copies; push can still fail if the server requests an absent blob.
-- Keep descriptor, manifest, and blob sizes within CLI and server caps.
+- Treat a prior hash or length as stale after changing the bytes it describes.
+- Treat stamps-only missing files as partial copies; restore a blob unless its availability at the verified target or base is established.
+- Distinguish Source `content_length` from Section `content_length` and `provenance_length`; do not use `capture_length`.
+- Keep Descriptor, manifest, and blob sizes within both OpenAKB schema caps and the target deployment's actual caps.
 
-Use the bundled audit for natural-key collisions because offline structural validation may lack server inventory context.
+Use the bundled audit for local path, stamp, natural-key, typed-ID, and citation-reference checks. Use the current OpenAKB validator and CLI for full structural, content, sidecar, inline-citation, platform-policy, and deployment-cap validation.
 
-## Understand Push State
+## Recover From Observed State
 
-Default `nurok kb push` loads and stamps the copy, runs preflight, resolves or creates a target, writes a new namespace when needed, creates a draft, uploads missing blobs, and promotes to merge. Preserve the snapshot ID after draft creation.
+Do not assume what the publication command did before failure. Re-read:
 
-After a timeout, inspect the snapshot:
+- remote KB identity, record metadata, visibility, and live revision;
+- all relevant snapshots and their current states and versions;
+- local `openakb.json`, its diff, and the generator source of truth;
+- working-copy bytes and integrity data;
+- the failed command's structured output and recovery hints.
 
-- `merged`: verify; do not promote again.
-- `finalized` or `approved`: choose the next transition deliberately.
-- `draft` plus retryable timeout: resume with the current `descriptor_version` after checking progress.
-- `draft` plus validation errors: repair locally and create a corrected snapshot.
-- deleted, superseded, or unknown: inspect history and do not guess.
+Inspect the current lifecycle help and choose only a supported working-copy-aware recovery operation. If a matching draft is resumable, verify its target, Descriptor, blob completeness, and drift guards before reusing it. If it is already live, verify rather than advancing it again. If it contains invalid content, repair and revalidate locally before creating a corrected snapshot. Stop repeated attempts when remote state shows no progress.
 
-For local deployments, correlate API, knowledge-base, and search logs around the request. Decreasing unprocessed counts can show useful progress; healthy containers alone do not prove the operation fits gateway timeouts.
+Do not hardcode metadata defaults, lifecycle flags, command conflicts, pull or push write-back behavior, cap cache details, JSON envelopes, or pagination paths in this skill. The installed CLI defines those execution details.
 
-## Use Flags Deliberately
-
-| Flag | Use |
-| --- | --- |
-| `--message` | Record the revision change. |
-| `--draft` | Upload without promotion. |
-| `--finalize` | Validate and freeze without merge. |
-| `--approve` | Record owner approval. |
-| `--expected-revision` | Refuse to overwrite a moved live revision. |
-| `--base` | Select a specific base snapshot. |
-| `--sync-metadata` | Patch record metadata before snapshot creation; re-check the record after any later failure. |
-| `--no-create` | Forbid implicit creation. |
-| `--no-verify` | Use only for explicit diagnostics, never routine publication. |
-
-Completion requires valid local artifacts, a merged/live revision, the intended remote record, relevant retrieval, and an explicit disposition for failed drafts.
+Completion requires valid local artifacts, the intended remote record and live revision, verified record metadata and visibility, relevant retrieval evidence, reconciled local Descriptor state, and an explicit disposition for failed or retained drafts.

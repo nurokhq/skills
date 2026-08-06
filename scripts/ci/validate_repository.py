@@ -321,9 +321,13 @@ def validate_management_guardrails(plugin_root: Path, errors: list[str]) -> None
     for term in ("authority", "endpoint", "identity", "visibility", "target"):
         if term not in contents:
             errors.append(f"{relative(skill_root)}: missing {term} guardrail")
-    if "--no-create" not in contents:
+    if "create-prevention guard" not in contents:
         errors.append(
-            f"{relative(skill_root)}: missing existing-KB --no-create guardrail"
+            f"{relative(skill_root)}: missing existing-KB create-prevention guardrail"
+        )
+    if "nurok kb <command> --help" not in contents:
+        errors.append(
+            f"{relative(skill_root)}: missing runtime CLI discovery guardrail"
         )
 
 

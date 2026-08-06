@@ -1,113 +1,73 @@
 # Publish And Recover
 
-Read this reference before creating or changing remote Nurok state, or when a prior push left a snapshot or draft.
+Read this reference before creating or changing remote Nurok state, or when a prior publication left a snapshot or draft.
 
-## Inspect The Environment
+## Inspect The Environment And CLI
 
-Use the endpoint selected by the user. A common local configuration is:
-
-```bash
-export NUROK_WEB_URL="http://127.0.0.1:3000/"
-export NUROK_API_URL="http://127.0.0.1:8333/"
-```
-
-Inspect the CLI, endpoint, and authentication before mutation:
+Use the endpoint selected by the user. Before mutation, inspect the installed CLI and every candidate command:
 
 ```bash
 nurok --version
-nurok config show --output json --pretty
-nurok status --output json --pretty
+nurok --help
+nurok kb --help
+nurok kb <command> --help
 ```
 
-Require Nurok CLI 0.2.0 or later and inspect `nurok kb push --help` before relying on mutating flags. State whether the API is local, staging, or production. An expired access token may refresh during push; a missing authenticated session is a blocker. Redact tokens, API keys, credential-store paths, and sensitive headers from all output and reports.
+Continue through nested help for lifecycle commands. Use the current CLI's supported diagnostics to verify the effective API endpoint and authenticated identity without exposing credentials. State whether the API is local, staging, or production. Redact tokens, API keys, credential-store paths, and sensitive headers from all output and reports.
+
+Do not assume command names, flags, defaults, conflicts, output envelopes, metadata behavior, recovery entry points, or Descriptor write-back behavior from an earlier CLI release. If the current surface cannot enforce the required target, create/update, drift, and recovery guardrails, stop the mutation and report the missing capability.
+
+## Prepare Every Mutation
+
+Before invoking a remote mutation:
+
+1. Confirm publish authority, effective endpoint, authenticated owner, `kb_identity`, lifecycle mode, and intended visibility.
+2. Save the remote record, live revision, record metadata, relevant snapshot state, local `openakb.json`, generator source of truth, and working-copy diff.
+3. Inspect help for the exact validate, publish, metadata, snapshot, source-registry, and visibility operations needed.
+4. Determine whether the command may create a KB, overwrite files, write Descriptor identity or stamps, synchronize record metadata, or advance lifecycle state.
+5. Validate the publishing copy with the current CLI and resolve all error-severity results.
+
+Never bypass validation to evade Descriptor, content, path, policy, or deployment-cap errors.
 
 ## Publish A New KB
 
-Use create mode only when the user authorized a new remote KB, the descriptor is unbound, and read-only checks found no intended existing target. Validate the publishing copy immediately before push:
+Use create mode only when the user authorized a new remote KB, the Descriptor is unbound, and read-only checks found no intended existing target. Use only the create or publish workflow documented by the installed CLI.
 
-```bash
-nurok kb validate --dir <publishing-copy> --output json --pretty
-```
-
-Then publish:
-
-```bash
-nurok kb push \
-  --dir <publishing-copy> \
-  --message "<specific initial revision>" \
-  --output json \
-  --pretty
-```
-
-A namespaceless descriptor pushed without `--kb` implicitly creates a private KB for the authenticated owner and writes the namespace back before snapshot publication. Preserve that binding even if a later upload or promotion step fails. If the owner already has the slug, resolve the existing record instead of retrying implicit creation.
+Before execution, verify how the current command selects or creates the target and what it writes back to `openakb.json`. After execution or failure, re-read and diff the Descriptor. Preserve any verified remote binding written during a partially successful operation. If the intended owner already has the target slug, resolve that existing record instead of retrying creation.
 
 ## Publish An Existing KB
 
-Require verified local and remote identity. Run record-aware validation immediately before mutation:
+Require verified local and remote identity. Select the target explicitly through the form supported by the current CLI. Require its create-prevention guard and use its concurrency, revision, or version guard against the recorded baseline.
 
-```bash
-nurok kb validate \
-  --kb <owner/slug> \
-  --dir <publishing-copy> \
-  --output json \
-  --pretty
-```
+Decide separately whether remote record metadata should change. Inspect current help to determine whether metadata synchronization is part of publication or a separate operation. Save the record baseline because metadata and snapshot publication may not be transactional. After any failure, re-read the record before deciding whether to retry, preserve, or explicitly revert a partial metadata change.
 
-Then use the same explicit target, forbid creation, and guard the recorded live revision:
-
-```bash
-nurok kb push \
-  --kb <owner/slug> \
-  --dir <publishing-copy> \
-  --no-create \
-  --expected-revision <live-revision> \
-  --message "<specific change>" \
-  --output json \
-  --pretty
-```
-
-Add `--sync-metadata` only when descriptor metadata should patch the record. It runs before snapshot creation and is not rolled back when a later upload or promotion step fails. Capture the metadata baseline before using it and re-read the record on every failure. Omit `--expected-revision` only when no live revision exists or the user explicitly authorizes an unguarded update. Do not use `--draft`, `--finalize`, or `--approve` unless the requested workflow requires that lifecycle boundary.
-
-Capture the endpoint, KB ID, owner/slug, snapshot ID, descriptor version, revision, state, and warnings. Do not end while an upload or promotion process is still running.
+Capture the endpoint, KB ID, owner/slug, snapshot identity, Descriptor version, revision, state, local Descriptor diff, and warnings from the actual results. Do not end while an upload or promotion process is still running.
 
 ## Recover A Failed Publication
 
-Separate the failure by lifecycle boundary:
+Use observed remote and local state, not a memorized flag sequence:
 
-1. If the failed push used `--sync-metadata`, re-read the KB record and compare it with the saved baseline. Record metadata may have changed even when no draft or live revision exists. Preserve or revert that partial change only with user authorization.
-2. If no draft exists, fix the local, validation, identity, or authentication error and revalidate.
-3. If a draft exists, inspect it before any new push:
+1. Re-read the KB record, record metadata, live revision, local Descriptor, and known snapshot state.
+2. Inspect the current snapshot lifecycle and publication command help, including nested recovery commands.
+3. List and inspect relevant snapshots using the current output and pagination structure. Verify target, state, version, Descriptor, and blob completeness before mutation.
+4. If no draft exists, repair the local, validation, identity, authorization, or authentication error and revalidate.
+5. If a matching resumable draft exists, prefer the current CLI's working-copy-aware resume path. Do not create a duplicate draft merely because the original command failed.
+6. Before resuming, verify that the working copy still matches the draft and that the current command offers the necessary idempotency and version or drift guard.
+7. Advance only the required next lifecycle transition. If the snapshot is already live or merged, verify completion and do not promote it again.
+8. If server validation rejected content, repair and revalidate the working copy before creating any corrected snapshot.
+9. Stop repeated attempts when state and service evidence show no progress.
 
-   ```bash
-   nurok kb snapshot list --kb <owner/slug> --limit 100 --output json --pretty
-   nurok kb snapshot get <snapshot-id> --output json --pretty
-   ```
-
-4. If it is merged, verify the KB and do not promote it again.
-5. If it is finalized or approved, choose only the required next transition.
-6. If it remains draft after a retryable timeout, establish idempotency and progress, then resume the same snapshot:
-
-   ```bash
-   nurok kb snapshot promote <snapshot-id> \
-     --to merge \
-     --message "<change summary>" \
-     --expected-version <descriptor-version> \
-     --output json \
-     --pretty
-   ```
-
-7. If server validation rejected content, repair and validate the working copy, then create a corrected snapshot.
-8. Stop repeated promotion attempts when state and service evidence show no progress.
-
-Do not delete a pre-existing draft. Delete an invalid draft created during the current task only after a successful replacement and only when the user-authorized workflow permits cleanup.
+Write published namespace, revision, hash, or length data back to the maintained local source only when the recovered remote result and working-copy bytes agree. Do not delete a pre-existing draft. Delete an invalid draft created during the current task only when the authorized workflow permits cleanup and a successful replacement is verified.
 
 ## Verify Completion
 
-```bash
-nurok kb show --kb <owner/slug> --output json --pretty
-nurok kb search --kb <owner/slug> "<representative query>" --limit 3 --output json --pretty
-```
+Use the current CLI's supported read operations to verify:
 
-Require the intended owner/slug, KB ID, visibility, live state, returned revision, metadata, and relevant search result. Page through `nurok kb source pointers` with a limit no greater than 100 and follow the cursor to EOF when pointer visibility is part of the task.
+- intended endpoint, owner/slug, KB ID, visibility, and live state;
+- returned live revision and remote record metadata;
+- snapshot state and absence or explicit retention of failed drafts;
+- representative section retrieval or search evidence;
+- source pointer projections when they are in scope;
+- actual post-command `openakb.json` changes.
 
-Reconcile server-written namespace and stamps into both maintained copies and validate again when local artifacts changed. Report IDs, revision, merge state, counts, tests, validations, retrieval evidence, metadata status, pointer status, warnings, retained drafts, and uncommitted local files. Claim visual verification only when a browser was actually used.
+Follow pagination using the structured fields actually returned by the installed CLI. Reconcile verified server-written namespace and stamps into each maintained copy and validate again when local artifacts changed. Report IDs, revision, lifecycle state, counts, tests, validations, retrieval evidence, metadata status, pointer status, warnings, retained drafts, and uncommitted local files. Claim visual verification only when a browser was actually used.

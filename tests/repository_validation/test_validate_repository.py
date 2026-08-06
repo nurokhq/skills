@@ -13,6 +13,7 @@ validator = runpy.run_path(str(VALIDATOR_PATH))
 validate_read_only_skill = validator["validate_read_only_skill"]
 validate_skill_links = validator["validate_skill_links"]
 validate_portable_skill_markdown = validator["validate_portable_skill_markdown"]
+validate_management_guardrails = validator["validate_management_guardrails"]
 
 
 class RepositoryValidationTests(unittest.TestCase):
@@ -92,6 +93,40 @@ class RepositoryValidationTests(unittest.TestCase):
             validate_portable_skill_markdown(skill_root, errors)
 
         self.assertEqual(errors, [])
+
+    def test_runtime_discovered_create_prevention_guard_is_allowed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            plugin_root = Path(directory) / "nurok-kb-manage"
+            skill_root = plugin_root / "skills" / "nurok-kb-manage"
+            skill_root.mkdir(parents=True)
+            (skill_root / "SKILL.md").write_text(
+                "Confirm authority, endpoint, identity, visibility, and target. "
+                "Require the current CLI's create-prevention guard. "
+                "Inspect `nurok kb <command> --help`.\n",
+                encoding="utf-8",
+            )
+            errors: list[str] = []
+
+            validate_management_guardrails(plugin_root, errors)
+
+        self.assertEqual(errors, [])
+
+    def test_literal_no_create_does_not_replace_runtime_discovery(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            plugin_root = Path(directory) / "nurok-kb-manage"
+            skill_root = plugin_root / "skills" / "nurok-kb-manage"
+            skill_root.mkdir(parents=True)
+            (skill_root / "SKILL.md").write_text(
+                "Confirm authority, endpoint, identity, visibility, and target. "
+                "Always use `--no-create`.\n",
+                encoding="utf-8",
+            )
+            errors: list[str] = []
+
+            validate_management_guardrails(plugin_root, errors)
+
+        self.assertTrue(any("create-prevention" in error for error in errors))
+        self.assertTrue(any("runtime CLI discovery" in error for error in errors))
 
 
 if __name__ == "__main__":
