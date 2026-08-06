@@ -106,7 +106,7 @@ The plugin-local directories remain the canonical source. Do not commit generate
 
 ## Upgrade
 
-After a skill update is published to the branch or release you installed, upgrade it with the same installation method.
+After a skill update is published, upgrade it with the same installation method.
 
 For Codex, refresh the marketplace snapshot and reinstall each installed plugin:
 
@@ -135,13 +135,23 @@ hermes skills update nurok-kb-manage
 hermes skills update nurok-kb-capture
 ```
 
-For a portable Skills CLI installation, update the tracked skills in the current scope:
+For a project-scoped portable Skills CLI installation, run the update from the directory that contains `skills-lock.json`:
 
 ```bash
-npx skills update nurok-kb nurok-kb-manage nurok-kb-capture
+npx skills update --project nurok-kb nurok-kb-manage nurok-kb-capture
 ```
 
-Use `--global` or `--project` to select the original Skills CLI installation scope. Only run the commands for plugins or skills you installed, then restart the client or start a new session so it loads the updated instructions.
+For a global portable Skills CLI installation, use the global scope explicitly:
+
+```bash
+npx skills update --global nurok-kb nurok-kb-manage nurok-kb-capture
+```
+
+When skill names are provided without `--project` or `--global`, the Skills CLI checks both scopes. Prefer an explicit scope so the command updates the installation intended. Project tracking is stored in `skills-lock.json`. Global tracking is stored in `$XDG_STATE_HOME/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, or `~/.agents/.skill-lock.json` otherwise.
+
+The Skills CLI updates from the source, skill path, and Git ref recorded at installation. A moving branch such as `main` receives later changes on that branch. A release tag remains pinned to that tag; moving to a newer tag requires another `skills add` command that names the new tag. Updating reinstalls and can overwrite the installed skill directory. It does not install newly published skills, and non-interactive `--yes` updates do not remove skills deleted upstream.
+
+Project updates re-detect the currently available agents and use the current non-interactive installation defaults. The project lock does not preserve the original target-agent list or the original `--copy` choice. Only run the command for skills installed through the Skills CLI, then restart the client or start a new session so it loads the updated instructions.
 
 ## Prerequisites
 
