@@ -17,7 +17,17 @@ Each plugin is standalone and declares no dependency on either of the others. In
 
 ## Install
 
-### Direct Installation
+### Ask An Agent
+
+Give a compatible coding agent this prompt, replacing the skill name when needed:
+
+```text
+Install the nurok-kb-capture skill from https://github.com/nurokhq/skills
+```
+
+The agent can use its native installer or a compatible Agent Skills installer.
+
+### Native Installers
 
 Use a client's native installer when it supports this repository layout. These commands are client-specific and do not use the portable Skills CLI.
 
@@ -57,50 +67,27 @@ hermes skills install nurokhq/skills/plugins/nurok-kb-manage/skills/nurok-kb-man
 hermes skills install nurokhq/skills/plugins/nurok-kb-capture/skills/nurok-kb-capture
 ```
 
-These commands follow the repository's default branch and install into Hermes' managed skills directory. Use the Skills CLI method below when a branch or release tag must be explicit.
+These commands follow the repository's default branch and install into Hermes' managed skills directory. Use the Skills CLI method below for portable project or global installations.
 
-### Install with the Skills CLI
+### Portable Skills CLI
 
-Use the open [Skills CLI](https://github.com/vercel-labs/skills) for one portable installation flow across Hermes, OpenClaw, Cursor, and OpenCode. This installs Agent Skills rather than Codex or Claude Code plugins.
+The open [Skills CLI](https://github.com/vercel-labs/skills) provides common `npx` commands for compatible agents. The following examples use `nurok-kb-capture`; substitute `nurok-kb` or `nurok-kb-manage` for another skill.
 
-Choose the target agent and scope:
-
-| Client | `--agent` value | Recommended scope option | Expected target |
-| --- | --- | --- | --- |
-| Hermes | `hermes-agent` | `--global` | `~/.hermes/skills/` |
-| OpenClaw | `openclaw` | None | `<project>/skills/` |
-| Cursor | `cursor` | None | `<project>/.agents/skills/` |
-| OpenCode | `opencode` | None | `<project>/.agents/skills/` |
-
-The following examples target Cursor. Replace `cursor` with the required `--agent` value, and add `--global` for the recommended Hermes installation.
-
-Use the simplified GitHub source to follow the repository's default branch:
+For a project installation, run both commands from the target workspace root:
 
 ```bash
-npx skills add nurokhq/skills --skill nurok-kb --agent cursor --yes
-npx skills add nurokhq/skills --skill nurok-kb-manage --agent cursor --yes
-npx skills add nurokhq/skills --skill nurok-kb-capture --agent cursor --yes
+npx skills add nurokhq/skills --skill nurok-kb-capture
+npx skills update --project nurok-kb-capture
 ```
 
-Use full GitHub `tree` URLs to pin a branch or release tag:
+For a global installation, use the global scope explicitly for both commands:
 
 ```bash
-npx skills add https://github.com/nurokhq/skills/tree/main/plugins/nurok-kb/skills/nurok-kb --agent cursor --yes
-npx skills add https://github.com/nurokhq/skills/tree/main/plugins/nurok-kb-manage/skills/nurok-kb-manage --agent cursor --yes
-npx skills add https://github.com/nurokhq/skills/tree/main/plugins/nurok-kb-capture/skills/nurok-kb-capture --agent cursor --yes
+npx skills add nurokhq/skills --skill nurok-kb-capture --global
+npx skills update --global nurok-kb-capture
 ```
 
-The Skills CLI does not have a `--ref` option. Replace `main` in the `tree` URLs with the required branch name or release tag when an exact revision is needed. Do not use the `owner/repo@ref` form for a Git ref because the `@` suffix can select a skill.
-
-List the skills available from the repository before installation:
-
-```bash
-npx skills add nurokhq/skills --list
-```
-
-After installation, verify that the expected target contains the complete skill directory and its `SKILL.md`; current Skills CLI versions may include other detected clients in `skills list --agent` output. Start a new client session so it discovers the installed skills.
-
-OpenClaw's native Git installer requires `SKILL.md` at the Git source root, which does not match this multi-plugin repository. Use the Skills CLI for OpenClaw unless the skills are published separately through ClawHub. Cursor provides a GitHub import UI but no equivalent native installation command, and OpenCode does not document a native skill installation command.
+The add command prompts for a target agent when needed. See the [Skills CLI documentation](https://github.com/vercel-labs/skills) for supported agents and options. Restart the client or start a new session after adding or updating a skill.
 
 The plugin-local directories remain the canonical source. Do not commit generated client-specific copies.
 
@@ -134,24 +121,6 @@ hermes skills update nurok-kb
 hermes skills update nurok-kb-manage
 hermes skills update nurok-kb-capture
 ```
-
-For a project-scoped portable Skills CLI installation, run the update from the directory that contains `skills-lock.json`:
-
-```bash
-npx skills update --project nurok-kb nurok-kb-manage nurok-kb-capture
-```
-
-For a global portable Skills CLI installation, use the global scope explicitly:
-
-```bash
-npx skills update --global nurok-kb nurok-kb-manage nurok-kb-capture
-```
-
-When skill names are provided without `--project` or `--global`, the Skills CLI checks both scopes. Prefer an explicit scope so the command updates the installation intended. Project tracking is stored in `skills-lock.json`. Global tracking is stored in `$XDG_STATE_HOME/skills/.skill-lock.json` when `XDG_STATE_HOME` is set, or `~/.agents/.skill-lock.json` otherwise.
-
-The Skills CLI updates from the source, skill path, and Git ref recorded at installation. A moving branch such as `main` receives later changes on that branch. A release tag remains pinned to that tag; moving to a newer tag requires another `skills add` command that names the new tag. Updating reinstalls and can overwrite the installed skill directory. It does not install newly published skills, and non-interactive `--yes` updates do not remove skills deleted upstream.
-
-Project updates re-detect the currently available agents and use the current non-interactive installation defaults. The project lock does not preserve the original target-agent list or the original `--copy` choice. Only run the command for skills installed through the Skills CLI, then restart the client or start a new session so it loads the updated instructions.
 
 ## Prerequisites
 
