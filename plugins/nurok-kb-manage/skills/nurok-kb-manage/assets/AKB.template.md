@@ -1,74 +1,77 @@
 # <Knowledge Base Title>
 
-<One-sentence description of the curated knowledge base.>
+<One-sentence description of the approved canonical original documents preserved by this knowledge base.>
 
 ## Scope Contract
 
-This KB helps <audience> answer <question family> using <evidence types>, within <explicit boundaries>.
+This KB preserves <approved canonical original documents> for verbatim retrieval by <audience>, within <explicit boundaries>.
 
-### Supported Questions
+### Approved Canonical Originals
 
-- <Question family one>
-- <Question family two>
+| Source | Canonical URI | Capture | Document Boundary | Approval |
+| --- | --- | --- | --- | --- |
+| <Original document> | <Canonical URI> | <Hash-pinned capture> | <Whole document or explicit boundary> | <User authorization> |
 
-### In Scope
+### Excluded Discovery Material
 
-- <Included entity, topic, source type, time, or language boundary>
+- <Repost, translation, search result, index, or corroborating source used only to locate or verify an original>
 
-### Out Of Scope
+### Explicit Boundaries
 
-- <Excluded material and why it does not serve this KB>
+- <Included document, source type, time, or language boundary>
+- <Excluded material and why it is not an approved original>
 
-### Borderline Cases
+## Original Content Policy
 
-| Case | Decision | Reason |
-| --- | --- | --- |
-| Substantive product release with technical design detail | Review | Include only when it adds durable knowledge inside the scope. |
-| Routine changelog or patch note | Exclude | It records transient operations rather than durable knowledge. |
+- Treat each approved canonical original as one stable document boundary.
+- Preserve the immutable capture, canonical URI, publisher or author, capture time, content hash, and content length.
+- Keep discovery notes, auxiliary evidence, summaries, translations, analysis, and other derived material outside the KB.
+- Keep every immutable capture complete and unchanged.
+- Apply original-only to every retained article-body range: preserve every visible source word, punctuation mark, capitalization choice, link target, paragraph boundary, and ordering.
+- Apply article-body-only to each Source block: omit only structurally identified page chrome and retain the title once plus all article prose.
 
-## Evidence Policy
+## Source Block Structure
 
-- Treat each URL or capture as a source, not automatically as a section.
-- Preserve canonical URL, publisher or author, capture time, and content hash.
-- Prefer the newest successful capture for duplicate canonical URLs unless historical comparison is in scope.
-- Reject failed, empty, duplicated, or materially corrupted captures.
-- Keep attribution visible when several sources contribute to one topic section.
+| Section | Source Block | Source | Original Title | Included Article-Body Ranges | Excluded Page-Chrome Ranges And Evidence | Order |
+| --- | --- | --- | --- | --- | --- | --- |
+| <Section ID> | <Stable block ID or index> | <Source ID> | <Exact original text> | <Ranges or equivalent provenance> | <Ranges plus DOM/template/repetition evidence> | <Sequence> |
 
-## Topic Taxonomy
+A Section may contain one or more Sources, and one Source may support several Sections. List every represented Source in the Section's `source_ids`. Keep each Source in an independent block; never interleave prose or add transitions, comparisons, or synthesis across blocks.
 
-| Section | Retrieval Purpose | Include | Exclude |
-| --- | --- | --- | --- |
-| <Stable topic> | <Questions this section should answer> | <Material that belongs> | <Nearest material that does not belong> |
+## Article-Body Selection
 
-## Section Policy
+Keep the article title once, all article prose in original order, original headings, lists, quotations, tables, code, and meaningful captions, footnotes, references, and disclosures.
 
-- Declare whether sections represent topics, documents, records, reports, investigations, or another stable retrieval unit.
-- For topic-oriented KBs, map every new source to the most specific existing topic before proposing a new section.
-- Create a section only for a durable, distinct retrieval intent that cannot fit an existing section coherently.
-- Use names stable for the declared retrieval unit; avoid article titles, dates, releases, or campaigns for topic-oriented sections.
-- Keep publisher, author, date, source type, and URL in metadata or provenance unless they define the KB scope.
-- Preserve section IDs across wording changes.
-- Document source mappings when splitting, merging, or retiring sections.
+Exclude navigation, breadcrumbs, footers, product menus, cookie or login controls, share widgets, newsletter or subscription prompts, related-post cards, CTA labels, repeated title/byline/date/category/issue/read-time UI, interaction labels, duplicated scrape blocks, and broken UI labels only when structural evidence identifies them as outside the article body. Never exclude text merely because it seems unimportant. Keep or hold ambiguous material for review, and never alter the capture.
 
-## Content Assembly
+## Section Formatting
 
-- Organize topic content by claims or source subheadings appropriate to this corpus.
-- Preserve per-source attribution and provenance.
-- Do not duplicate a full source across sections; use a primary mapping and concise cross-references.
-- <Define ordering, deduplication, language, and freshness conventions.>
+Allow presentation-only Markdown that makes the original easier to read:
+
+- Add blank lines only between existing source paragraphs.
+- Render an existing title or heading with Markdown heading markers or bold markers while copying its visible text exactly.
+- Represent existing lists, quotations, tables, links, and code with equivalent Markdown structure.
+- Split long documents only at existing paragraph or heading boundaries and retain source order.
+
+Do not correct, rewrite, translate, summarize, paraphrase, deduplicate article prose, join or split sentences, reorder, add transitions, or insert explanations and conclusions.
+
+When formatting prevents byte equality, record Source-block ranges or equivalent provenance that proves the visible text remains the same ordered content as the included article-body ranges.
 
 ## Update Protocol
 
-1. Inventory candidate sources and deduplicate canonical URLs.
-2. Record `include/exclude/hold`, scope, target section, and rationale for every candidate.
-3. Review mappings to existing sections before approving any new section.
-4. Update this document before implementing a scope or taxonomy change.
-5. Regenerate deterministically and run focused tests plus OpenAKB validation.
+1. Confirm explicit approval and a valid immutable capture for every added Source.
+2. Update the Source-block map plus included and excluded ranges without changing unrelated Sources.
+3. Confirm that every exclusion is structurally identified page chrome and apply only the presentation formatting allowed above.
+4. Compare every Source block's visible text and order with its included article-body ranges.
+5. Regenerate deterministically, run focused tests and the bundled audit, and complete OpenAKB validation.
+6. Repeat original-content comparison on the publishing copy before push.
 
 ## Quality Gates
 
-- Every included source satisfies an in-scope rule.
-- Every content section has a stable topic and non-empty description.
-- Section growth matches the declared retrieval unit; topic-oriented KBs do not create sections mechanically per source.
-- New, split, merged, renamed, and retired sections have explicit rationales.
-- Provenance remains complete and auditable.
+- Every Source is an explicitly approved canonical original with a valid capture.
+- Every content Section cites all and only the Sources represented by its independent blocks.
+- Every Source block is article-body-only, maps to exactly one Source, and records included and excluded capture ranges.
+- Every Section title or heading copied from the source preserves its exact visible text.
+- Every formatting difference is presentation-only and provenance remains complete.
+- No Source block contains page chrome, an unexplained article-body omission, addition, replacement, reorder, summary, translation, interleaving, or cross-source synthesis.
+- Create and push stop on any unresolved original-content difference.

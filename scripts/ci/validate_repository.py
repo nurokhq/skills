@@ -331,6 +331,38 @@ def validate_management_guardrails(plugin_root: Path, errors: list[str]) -> None
         )
 
 
+def validate_original_content_guardrails(
+    skill_root: Path, plugin_name: str, errors: list[str]
+) -> None:
+    required_terms = {
+        "nurok-kb-capture": (
+            "canonical original",
+            "original content",
+            "one source document per capture",
+            "do not summarize",
+        ),
+        "nurok-kb-manage": (
+            "original-only",
+            "article-body-only",
+            "source block",
+            "presentation-only",
+        ),
+    }.get(plugin_name)
+    if required_terms is None:
+        return
+    path = skill_root / "SKILL.md"
+    try:
+        contents = path.read_text(encoding="utf-8").lower()
+    except OSError as error:
+        errors.append(f"{relative(path)}: {error}")
+        return
+    for term in required_terms:
+        if term not in contents:
+            errors.append(
+                f"{relative(path)}: missing original-content guardrail {term!r}"
+            )
+
+
 def validate_plugin(
     plugin_root: Path, skill_owners: dict[str, Path], errors: list[str]
 ) -> None:
@@ -353,7 +385,9 @@ def validate_plugin(
             f"got {sorted(skill_names)}"
         )
     for skill_name in sorted(skill_names):
-        validate_skill(skills_root / skill_name, plugin_root.name, skill_owners, errors)
+        skill_root = skills_root / skill_name
+        validate_skill(skill_root, plugin_root.name, skill_owners, errors)
+        validate_original_content_guardrails(skill_root, plugin_root.name, errors)
     if plugin_root.name == "nurok-kb-manage":
         validate_management_guardrails(plugin_root, errors)
 

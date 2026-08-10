@@ -1,7 +1,7 @@
 {
   "name": "nurok-kb-capture",
   "version": "0.1.0",
-  "description": "Capture, refresh, and assess source evidence for Nurok knowledge bases.",
+  "description": "Capture and refresh immutable canonical original evidence for Nurok knowledge bases.",
   "author": {
     "name": "Nurok",
     "email": "support@nurok.ai"

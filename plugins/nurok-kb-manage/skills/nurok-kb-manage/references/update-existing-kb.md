@@ -42,9 +42,9 @@ Inspect revision and snapshot history rather than inferring it from the current 
 
 ## Plan The Delta
 
-Reapply the scope and curation rules to every candidate source. Record included, excluded, and held counts; existing-topic mappings; proposed sections; structural changes; metadata changes; provenance changes; and unexpected count changes.
+Require explicit approval and a valid canonical capture for every added Source. Record added and removed documents, Source-block-to-Section mappings, included article-body ranges, structurally excluded page-chrome ranges, presentation-only formatting changes, metadata changes, provenance changes, and unexpected count changes. Keep discovery and auxiliary material outside the KB.
 
-Preserve stable typed IDs, namespace, capture times, content boundaries, and unchanged integrity data. If scope or taxonomy changes, update `AKB.md` before the generator. Avoid unrelated crawler, corpus, taxonomy, and formatting changes.
+Preserve stable typed IDs, namespace, capture times, document boundaries, source order, and unchanged integrity data. Update `AKB.md` before the generator when approved Sources, Section ranges, or formatting rules change. Avoid unrelated crawler, source, document-structure, and formatting changes.
 
 ## Keep Metadata Layers Separate
 
@@ -73,6 +73,7 @@ Treat `openakb.json` as a mixed-state artifact: corpus-owned content may coexist
 - After any CLI command that may write back state, diff the actual file and structurally reconcile platform-written fields into the maintained source of truth.
 - When bytes change, treat their prior hashes and lengths as stale; when bytes do not change, preserve verified stamps.
 - Compare aggregate content hashes; count equality is not proof of content equality.
+- Compare every changed Source block's visible text with its included article-body ranges. Stop on any addition, unexplained article-body omission, replacement, reorder, interleaving, page-chrome exclusion without structural evidence, or change that is not presentation-only formatting.
 
 ## Synchronize The Publishing Copy
 
@@ -82,6 +83,6 @@ Copy only changed artifacts, confirm source and publishing artifacts are byte-id
 
 ## Require Update Evidence
 
-Before publication, require valid local artifacts, a verified explicit remote target, intended metadata, preserved visibility, stable identity, reviewed taxonomy changes, and a specific revision message. Use the current CLI's create-prevention and concurrency or revision guards. If the installed CLI cannot express the necessary identity and drift protections, stop rather than issue an unguarded mutation.
+Before publication, require valid local artifacts, a verified explicit remote target, intended metadata, preserved visibility, stable identity, verified original-content integrity, and a specific revision message. Use the current CLI's create-prevention and concurrency or revision guards. If the installed CLI cannot express the necessary identity and drift protections, stop rather than issue an unguarded mutation.
 
-After publication, require the intended live revision and metadata, unchanged visibility unless authorized, expected source pointer projections, representative retrieval, an inspected local Descriptor diff, and an explicit disposition for retained drafts or local differences.
+After publication, require the intended live revision and metadata, unchanged visibility unless authorized, expected source pointer projections, representative retrieved Section text matching the validated publishing copy, an inspected local Descriptor diff, and an explicit disposition for retained drafts or local differences.

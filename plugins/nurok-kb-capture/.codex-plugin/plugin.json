@@ -1,7 +1,7 @@
 {
   "name": "nurok-kb-capture",
   "version": "0.1.0",
-  "description": "Capture, refresh, and assess source evidence for Nurok knowledge bases.",
+  "description": "Capture and refresh immutable canonical original evidence for Nurok knowledge bases.",
   "author": {
     "name": "Nurok",
     "email": "support@nurok.ai",
@@ -20,8 +20,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Nurok KB Capture",
-    "shortDescription": "Capture traceable KB source evidence",
-    "longDescription": "Collect, preserve, refresh, and assess source evidence for Nurok knowledge bases without prescribing a capture method or publishing KB revisions.",
+    "shortDescription": "Capture original KB source evidence",
+    "longDescription": "Capture and refresh explicitly approved canonical original source evidence without transforming content or publishing KB revisions.",
     "developerName": "Nurok",
     "category": "Developer Tools",
     "capabilities": [
@@ -31,9 +31,9 @@
     ],
     "websiteURL": "https://github.com/nurokhq/skills",
     "defaultPrompt": [
-      "Capture source evidence for a Nurok knowledge base.",
-      "Refresh KB source evidence with the available tools.",
-      "Assess whether existing KB source evidence is traceable."
+      "Capture this approved canonical original without transforming its content.",
+      "Refresh this canonical source and preserve the previous valid capture on failure.",
+      "Report the traceability fields for this original source capture."
     ]
   }
 }

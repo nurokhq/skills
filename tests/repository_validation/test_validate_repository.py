@@ -14,6 +14,7 @@ validate_read_only_skill = validator["validate_read_only_skill"]
 validate_skill_links = validator["validate_skill_links"]
 validate_portable_skill_markdown = validator["validate_portable_skill_markdown"]
 validate_management_guardrails = validator["validate_management_guardrails"]
+validate_original_content_guardrails = validator["validate_original_content_guardrails"]
 
 
 class RepositoryValidationTests(unittest.TestCase):
@@ -127,6 +128,47 @@ class RepositoryValidationTests(unittest.TestCase):
 
         self.assertTrue(any("create-prevention" in error for error in errors))
         self.assertTrue(any("runtime CLI discovery" in error for error in errors))
+
+    def test_capture_requires_original_content_guardrails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            skill_root = self.write_skill(
+                Path(directory),
+                "Preserve canonical original evidence and original content.\n",
+            )
+            errors: list[str] = []
+
+            validate_original_content_guardrails(skill_root, "nurok-kb-capture", errors)
+
+        self.assertTrue(
+            any("one source document per capture" in error for error in errors)
+        )
+        self.assertTrue(any("do not summarize" in error for error in errors))
+
+    def test_manage_original_content_guardrails_are_accepted(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            skill_root = self.write_skill(
+                Path(directory),
+                "Use original-only and article-body-only rules for each Source block. "
+                "Allow presentation-only Markdown.\n",
+            )
+            errors: list[str] = []
+
+            validate_original_content_guardrails(skill_root, "nurok-kb-manage", errors)
+
+        self.assertEqual(errors, [])
+
+    def test_manage_requires_article_body_and_source_block_guardrails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            skill_root = self.write_skill(
+                Path(directory),
+                "Preserve original-only content with presentation-only Markdown.\n",
+            )
+            errors: list[str] = []
+
+            validate_original_content_guardrails(skill_root, "nurok-kb-manage", errors)
+
+        self.assertTrue(any("article-body-only" in error for error in errors))
+        self.assertTrue(any("source block" in error for error in errors))
 
 
 if __name__ == "__main__":

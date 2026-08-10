@@ -10,8 +10,8 @@ Nurok Skills packages repeatable workflows for capturing, reading, and managing 
 | Plugin | Skill | Purpose |
 | --- | --- | --- |
 | `nurok-kb` | [`nurok-kb`](plugins/nurok-kb/skills/nurok-kb/) | Read, search, inspect, and synthesize KB evidence. |
-| `nurok-kb-manage` | [`nurok-kb-manage`](plugins/nurok-kb-manage/skills/nurok-kb-manage/) | Design, create, validate, publish, update, and recover KBs. |
-| `nurok-kb-capture` | [`nurok-kb-capture`](plugins/nurok-kb-capture/skills/nurok-kb-capture/) | Capture, refresh, and assess source evidence. |
+| `nurok-kb-manage` | [`nurok-kb-manage`](plugins/nurok-kb-manage/skills/nurok-kb-manage/) | Create, validate, and publish source-preserving, article-body-only KBs. |
+| `nurok-kb-capture` | [`nurok-kb-capture`](plugins/nurok-kb-capture/skills/nurok-kb-capture/) | Capture and refresh immutable canonical original evidence. |
 
 Each plugin is standalone and declares no dependency on either of the others. Install only the capture, read-only, or management capabilities needed for a task; cross-skill handoffs are conditional.
 
