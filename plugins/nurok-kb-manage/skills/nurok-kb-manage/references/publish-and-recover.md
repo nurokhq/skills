@@ -25,7 +25,7 @@ Before invoking a remote mutation:
 2. Save the remote record, live revision, record metadata, relevant snapshot state, local `openakb.json`, generator source of truth, and working-copy diff.
 3. Inspect help for the exact validate, publish, metadata, snapshot, source-registry, and visibility operations needed.
 4. Determine whether the command may create a KB, overwrite files, write Descriptor identity or stamps, synchronize record metadata, or advance lifecycle state.
-5. Compare every Source block with its included article-body ranges, verify every page-chrome exclusion against structural evidence, validate the publishing copy with the current CLI, and resolve all content-integrity and error-severity results.
+5. Compare every Source block with its included article-body ranges, verify every page-chrome exclusion against structural evidence, require the bundled audit to pass against both copies and their Descriptor projections, validate the publishing copy with the current CLI, and resolve all content-integrity and error-severity results.
 
 Never bypass original-content comparison or validation to evade Descriptor, content, path, policy, or deployment-cap errors.
 

@@ -36,6 +36,7 @@ When changing `nurok-kb-manage`, verify documented commands against the supporte
 ```bash
 uv sync --locked
 uv run python scripts/ci/validate_repository.py
+uv run python scripts/ci/verify_skill_distribution.py
 uv run ruff format --check plugins tests scripts
 uv run ruff check plugins tests scripts
 uv run python -m unittest discover -s tests -p "test_*.py" -v

@@ -79,7 +79,16 @@ Treat `openakb.json` as a mixed-state artifact: corpus-owned content may coexist
 
 Derive the publishing set from the Descriptor. Include `openakb.json` and every relative local blob referenced by `guide_uri`, section `content_uri` or `provenance_uri`, a `file` source `uri`, source `capture_uri`, or `x.ai.nurok.skill_uri`. The common simple set is `openakb.json`, `AKB.md`, and `sections/`, but it is not a complete allowlist. Do not copy unreferenced crawler code, raw archives, tests, caches, build notes, or virtual environments.
 
-Copy only changed artifacts, confirm source and publishing artifacts are byte-identical before publication, and validate both copies. After the CLI writes namespace, revision, hash, or length data, reconcile the actual Descriptor into the generator-preserved source copy without losing corpus-owned changes.
+Copy only changed artifacts, then compare the complete Descriptor projection before publication:
+
+```bash
+python3 <skill-dir>/scripts/audit_working_copy.py \
+  --dir <working-copy> \
+  --compare-dir <publishing-copy> \
+  --format json
+```
+
+Require no missing, unexpected, or byte-different projected files and identical aggregate digests, then validate both copies. After the CLI writes namespace, revision, hash, or length data, reconcile the actual Descriptor into the generator-preserved source copy without losing corpus-owned changes.
 
 ## Require Update Evidence
 

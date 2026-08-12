@@ -42,6 +42,7 @@ Omit suggested prompts unless the user supplies them. When prompts are required,
 - Give every category and section a non-empty description.
 - Omit `parent_id` from root categories. Require every `parent_id` to resolve to a Section and keep the parent graph acyclic.
 - Give every section with `content_uri` one or more `source_ids` citations. Require each ID to be unique case-insensitively and resolve to a declared Source. List every Source represented by an independent Source block and no others.
+- Start every independent Source block with `<!-- source-block:<Source ID> -->` followed by `[cite:<Source ID>]`. Keep Source block markers, inline citations, Descriptor `source_ids`, provenance `source_ids`, and provenance `source_blocks[].source_id` in the same order.
 - Use `sections/<section-id>/content.md` for hosted Markdown content.
 - Treat `content_type` as optional with the OpenAKB default `text/markdown`; do not make it mandatory because of a CLI or consumer implementation.
 - Require `discovered_via_id` to resolve to a Source. Require local link `section_id` and provenance-sidecar `section_id` to resolve to a Section; require sidecar claim `source_ids` and inline `[cite:]` IDs to resolve to Sources. Cross-AKB link Section IDs retain the Section type even when they cannot be resolved offline.
@@ -111,7 +112,9 @@ Before the structural audit, compare every Source block's visible text and order
 python3 <skill-dir>/scripts/audit_working_copy.py --dir <working-copy>
 ```
 
-Fix every error and review every warning. A stamps-only warning is valid only when the target or base snapshot already has that blob; restore the local file before creating a new KB or whenever blob availability is uncertain.
+The audit recomputes every present local blob's SHA-256 and byte length, checks ordered Source-block and citation relationships, validates declared provenance identities and ranges, and reports an aggregate digest over `openakb.json` plus every Descriptor-referenced local blob. Use `--format json` when a generator, CI job, or creation log consumes the result.
+
+Fix every error and review every warning. Exit status `0` means no audit errors, `1` means blocking findings, and `2` means the audit could not run. A stamps-only warning is valid only when the target or base snapshot already has that blob; restore the local file before creating a new KB or whenever blob availability is uncertain.
 
 Then run the project generator and focused tests and rebuild once to check stability. Treat the current OpenAKB validator and Nurok CLI as authoritative for full descriptor, content, sidecar, inline-citation, policy, path, and deployment-cap validation. Discover the installed validation surface before invoking it:
 
