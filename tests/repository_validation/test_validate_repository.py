@@ -45,6 +45,19 @@ class RepositoryValidationTests(unittest.TestCase):
         self.assertIn("--base-ref", workflow)
         self.assertIn("fetch-depth: 0", workflow)
 
+    def test_readme_keeps_cli_optional_for_mcp_only_reads(self) -> None:
+        readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
+
+        self.assertIn(
+            "The read-only skill can use either the Nurok CLI or bundled Nurok MCP "
+            "read tools.",
+            readme,
+        )
+        self.assertIn("The management skill requires Nurok CLI 0.2.0 or later", readme)
+        self.assertNotIn(
+            "The read-only and management skills require the Nurok CLI.", readme
+        )
+
     def test_mutating_command_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             skill_root = self.write_skill(

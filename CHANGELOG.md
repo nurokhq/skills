@@ -28,3 +28,5 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 - Report non-UTF-8 provenance sidecars as structured audit findings.
 - Preserve complete summary counts when a descriptor cannot be loaded.
 - Run distribution and plugin-version checks against the pull request base in CI.
+- Return a structured comparison finding when a compared descriptor is not UTF-8.
+- Keep the Nurok CLI optional for read-only workflows that use bundled MCP tools.

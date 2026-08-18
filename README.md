@@ -124,7 +124,7 @@ hermes skills update nurok-kb-capture
 
 ## Prerequisites
 
-The read-only and management skills require the Nurok CLI. The management skill requires Nurok CLI 0.2.0 or later and Python 3.9 or later for its supplemental audit:
+The read-only skill can use either the Nurok CLI or bundled Nurok MCP read tools. CLI installation is optional for MCP-only reads. The management skill requires Nurok CLI 0.2.0 or later and Python 3.9 or later for its supplemental audit:
 
 ```bash
 curl -fsSL https://static.nurok.ai/cli/install.sh | bash

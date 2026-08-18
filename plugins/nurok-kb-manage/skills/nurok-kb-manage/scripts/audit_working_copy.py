@@ -1065,7 +1065,7 @@ def main() -> int:
         try:
             primary_descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
             compared_descriptor = json.loads(compared_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as error:
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
             add_finding(
                 findings,
                 "AKBA063",

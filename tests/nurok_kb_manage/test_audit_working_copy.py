@@ -850,6 +850,43 @@ class AuditWorkingCopyTests(unittest.TestCase):
             {"AKBA002", "AKBA003", "AKBA063"},
         )
 
+    def test_compare_dir_non_utf8_descriptor_returns_structured_finding(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary = root / "primary"
+            compared = root / "compared"
+            primary.mkdir()
+            compared.mkdir()
+            self.materialize_valid_references(
+                primary, descriptor_with_local_references()
+            )
+            (compared / "openakb.json").write_bytes(b"\xff")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(AUDIT_SCRIPT),
+                    "--dir",
+                    str(primary),
+                    "--compare-dir",
+                    str(compared),
+                    "--format",
+                    "json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertEqual(result.stderr, "")
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["summary"]["errors"], 1)
+        self.assertEqual(
+            [(finding["code"], finding["pointer"]) for finding in payload["findings"]],
+            [("AKBA063", "/compare_dir")],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
