@@ -368,12 +368,18 @@ def audit_content_markers(
     content = content_path.read_text(encoding="utf-8")
     block_matches = list(SOURCE_BLOCK_PATTERN.finditer(content))
     block_ids = [match.group(1).lower() for match in block_matches]
+    block_starts = [
+        len(content[: match.start()].encode("utf-8")) for match in block_matches
+    ]
+    content_length = len(content.encode("utf-8"))
     block_ranges = [
         (
-            len(content[: match.start()].encode("utf-8")),
-            len(content[: match.end()].encode("utf-8")),
+            start,
+            block_starts[index + 1]
+            if index + 1 < len(block_starts)
+            else content_length,
         )
-        for match in block_matches
+        for index, start in enumerate(block_starts)
     ]
     citation_ids = [
         match.group(1).lower() for match in CITATION_PATTERN.finditer(content)
@@ -636,17 +642,17 @@ def audit_provenance(
                 previous_range_end = end
                 if block_ranges is not None and index < len(block_ranges):
                     expected_start, expected_end = block_ranges[index]
-                    if not start <= expected_start < expected_end <= end:
+                    if (start, end) != (expected_start, expected_end):
                         add_finding(
                             findings,
                             "AKBA049",
                             "error",
                             f"{block_pointer}/section_byte_range",
-                            "Section byte range must contain its content Source marker",
-                            expected={
-                                "marker_start": expected_start,
-                                "marker_end": expected_end,
-                            },
+                            (
+                                "Section byte range must cover its complete "
+                                "content Source block"
+                            ),
+                            expected={"start": expected_start, "end": expected_end},
                             actual=byte_range,
                         )
 

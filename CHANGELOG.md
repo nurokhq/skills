@@ -32,7 +32,7 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 - Keep the Nurok CLI optional for read-only workflows that use bundled MCP tools.
 - Require each DCO sign-off to match its commit author.
 - Reject local references occupied by directories or other non-file entries.
-- Tie provenance byte ranges to ordered, non-overlapping Section Source blocks.
+- Require provenance byte ranges to cover complete ordered, non-overlapping Section Source blocks.
 - Reject malformed provenance claim collections and entries.
 - Reject symlinked canonical skill roots before traversal.
 - Reject repository-only tests anywhere inside a distributable skill tree.

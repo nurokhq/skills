@@ -106,6 +106,7 @@ class AuditWorkingCopyTests(unittest.TestCase):
             b"<!-- source-block:SRC-000002 -->\n"
             b"[cite:SRC-000002]\n\nSecond source.\n"
         )
+        second_block_start = content.index(b"<!-- source-block:SRC-000002 -->")
         provenance = {
             "section_id": "SEC-000001",
             "source_ids": ["SRC-000001", "SRC-000002"],
@@ -117,7 +118,10 @@ class AuditWorkingCopyTests(unittest.TestCase):
                         "sha256": sha256(b"hello").hexdigest(),
                         "content_length": 5,
                     },
-                    "section_byte_range": {"start": 0, "end": 62},
+                    "section_byte_range": {
+                        "start": 0,
+                        "end": second_block_start,
+                    },
                 },
                 {
                     "source_id": "SRC-000002",
@@ -125,7 +129,10 @@ class AuditWorkingCopyTests(unittest.TestCase):
                         "sha256": sha256(b"hello").hexdigest(),
                         "content_length": 5,
                     },
-                    "section_byte_range": {"start": 62, "end": len(content)},
+                    "section_byte_range": {
+                        "start": second_block_start,
+                        "end": len(content),
+                    },
                 },
             ],
         }
@@ -678,6 +685,31 @@ class AuditWorkingCopyTests(unittest.TestCase):
                 second["section_byte_range"],
                 first["section_byte_range"],
             )
+            path.write_text(json.dumps(provenance), encoding="utf-8")
+
+            findings, _ = audit(descriptor_path)
+
+        self.assertTrue(any(finding.code == "AKBA049" for finding in findings))
+
+    def test_provenance_ranges_must_cover_full_source_blocks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor_path = self.materialize_valid_references(
+                root, descriptor_with_local_references()
+            )
+            content = (root / "sections/SEC-000001/content.md").read_bytes()
+            path = root / "sections/SEC-000001/provenance.json"
+            provenance = json.loads(path.read_text(encoding="utf-8"))
+            markers = (
+                b"<!-- source-block:SRC-000001 -->",
+                b"<!-- source-block:SRC-000002 -->",
+            )
+            for index, marker in enumerate(markers):
+                start = content.index(marker)
+                provenance["source_blocks"][index]["section_byte_range"] = {
+                    "start": start,
+                    "end": start + len(marker),
+                }
             path.write_text(json.dumps(provenance), encoding="utf-8")
 
             findings, _ = audit(descriptor_path)
