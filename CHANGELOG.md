@@ -21,3 +21,6 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 
 - Reject malformed SHA-256 values before treating missing local blobs as stamps-only references.
 - Preserve primary audit findings when comparison setup cannot load a descriptor.
+- Return structured audit findings for non-string Source types.
+- Validate provenance byte ranges even when Section content is available only by stamp.
+- Require DCO sign-offs regardless of the commit's user-controlled author name.

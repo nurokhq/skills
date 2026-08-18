@@ -587,23 +587,29 @@ def audit_provenance(
                 f"{block_pointer}/section_byte_range",
                 "Source block provenance requires a Section byte range",
             )
-        elif content_length is not None:
+        else:
             start = byte_range.get("start")
             end = byte_range.get("end")
-            if (
+            valid_range = not (
                 not isinstance(start, int)
                 or isinstance(start, bool)
                 or not isinstance(end, int)
                 or isinstance(end, bool)
-                or not 0 <= start <= end <= content_length
-            ):
+                or not 0 <= start <= end
+            )
+            if valid_range and content_length is not None:
+                valid_range = end <= content_length
+            if not valid_range:
+                expected = "0 <= start <= end"
+                if content_length is not None:
+                    expected += f" <= {content_length}"
                 add_finding(
                     findings,
                     "AKBA040",
                     "error",
                     f"{block_pointer}/section_byte_range",
                     "Section byte range must be ordered and within content bytes",
-                    expected=f"0 <= start <= end <= {content_length}",
+                    expected=expected,
                     actual=byte_range,
                 )
 
@@ -707,7 +713,7 @@ def audit(descriptor_path: Path) -> tuple[list[Finding], dict[str, object]]:
             source_stamps[normalized_source_id] = stamps
 
         source_type = source.get("type")
-        if source_type not in SOURCE_TYPES:
+        if not isinstance(source_type, str) or source_type not in SOURCE_TYPES:
             add_finding(
                 findings,
                 "AKBA013",

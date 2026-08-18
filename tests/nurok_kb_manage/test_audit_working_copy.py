@@ -300,6 +300,33 @@ class AuditWorkingCopyTests(unittest.TestCase):
             any("duplicate source natural key" in error for error in errors(findings))
         )
 
+    def test_non_string_source_type_returns_structured_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor = descriptor_with_local_references()
+            descriptor["sources"][0]["type"] = []
+            descriptor_path = self.write_descriptor(root, descriptor)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(AUDIT_SCRIPT),
+                    "--dir",
+                    str(descriptor_path),
+                    "--format",
+                    "json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(
+            any(finding["code"] == "AKBA013" for finding in payload["findings"])
+        )
+
     def test_wrong_kind_section_id_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             descriptor = descriptor_with_local_references()
@@ -584,6 +611,31 @@ class AuditWorkingCopyTests(unittest.TestCase):
 
         self.assertTrue(any(finding.code == "AKBA044" for finding in findings))
         self.assertTrue(any(finding.code == "AKBA048" for finding in findings))
+
+    def test_stamps_only_content_still_validates_byte_ranges(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor_path = self.materialize_valid_references(
+                root, descriptor_with_local_references()
+            )
+            (root / "sections/SEC-000001/content.md").unlink()
+            provenance_path = root / "sections/SEC-000001/provenance.json"
+            provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+            provenance["source_blocks"][0]["section_byte_range"] = {
+                "start": "bad",
+                "end": -9,
+            }
+            provenance_bytes = json.dumps(provenance, separators=(",", ":")).encode()
+            provenance_path.write_bytes(provenance_bytes)
+            descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+            section = descriptor["sections"][0]
+            section["provenance_hash"] = stamp(provenance_bytes)
+            section["provenance_length"] = len(provenance_bytes)
+            descriptor_path = self.write_descriptor(root, descriptor)
+
+            findings, _ = audit(descriptor_path)
+
+        self.assertTrue(any(finding.code == "AKBA040" for finding in findings))
 
     def test_json_output_is_structured_and_stable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
