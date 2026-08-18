@@ -1,0 +1,25 @@
+{
+  "name": "nurok",
+  "description": "Independent Nurok plugins for capturing, reading, and managing knowledge bases.",
+  "owner": {
+    "name": "Nurok",
+    "email": "support@nurok.ai"
+  },
+  "plugins": [
+    {
+      "name": "nurok-kb",
+      "source": "./plugins/nurok-kb",
+      "skills": ["./skills/nurok-kb"]
+    },
+    {
+      "name": "nurok-kb-manage",
+      "source": "./plugins/nurok-kb-manage",
+      "skills": ["./skills/nurok-kb-manage"]
+    },
+    {
+      "name": "nurok-kb-capture",
+      "source": "./plugins/nurok-kb-capture",
+      "skills": ["./skills/nurok-kb-capture"]
+    }
+  ]
+}

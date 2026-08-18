@@ -1,0 +1,13 @@
+{
+  "name": "nurok-kb",
+  "version": "0.1.0",
+  "description": "Read, search, inspect, and synthesize Nurok knowledge bases through the CLI or MCP without changing remote state.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": ["knowledge-base", "mcp", "nurok", "search"]
+}

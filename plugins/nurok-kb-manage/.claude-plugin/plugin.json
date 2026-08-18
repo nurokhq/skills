@@ -1,0 +1,13 @@
+{
+  "name": "nurok-kb-manage",
+  "version": "0.1.0",
+  "description": "Create, validate, publish, and recover source-preserving Nurok knowledge bases with article-body-only Sections.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": ["knowledge-base", "nurok", "openakb"]
+}

@@ -1,0 +1,10 @@
+exclude_path = [
+  "docs/superpowers",
+  ".superpowers",
+  ".worktrees",
+  ".git",
+  ".venv",
+  "node_modules",
+]
+
+include_mail = false

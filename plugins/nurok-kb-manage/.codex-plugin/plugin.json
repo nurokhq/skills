@@ -1,0 +1,37 @@
+{
+  "name": "nurok-kb-manage",
+  "version": "0.1.0",
+  "description": "Create, validate, publish, and recover source-preserving Nurok knowledge bases with article-body-only Sections.",
+  "author": {
+    "name": "Nurok",
+    "email": "support@nurok.ai",
+    "url": "https://github.com/nurokhq"
+  },
+  "homepage": "https://github.com/nurokhq/skills",
+  "repository": "https://github.com/nurokhq/skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-skills",
+    "knowledge-base",
+    "nurok",
+    "openakb"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Nurok KB Manage",
+    "shortDescription": "Publish source-preserving Nurok knowledge bases",
+    "longDescription": "Create, update, validate, publish, and recover Nurok knowledge bases from immutable captures using article-body-only Source blocks, original-only retained text, presentation-only Markdown, and explicit safety checks.",
+    "developerName": "Nurok",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/nurokhq/skills",
+    "defaultPrompt": [
+      "Create and validate a Nurok KB with article-body-only Source blocks from approved original captures.",
+      "Update and publish a Nurok KB while preserving every retained source word and Source boundary.",
+      "Recover a failed publication without changing validated original content."
+    ]
+  }
+}
