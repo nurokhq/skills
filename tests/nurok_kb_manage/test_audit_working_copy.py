@@ -265,6 +265,29 @@ class AuditWorkingCopyTests(unittest.TestCase):
             any(error.startswith("/guide_uri:") for error in errors(findings))
         )
 
+    def test_absolute_filesystem_uri_forms_are_rejected(self) -> None:
+        values = (
+            "file:///etc/passwd",
+            r"C:\outside.txt",
+            r"\\server\share\outside.txt",
+            "//server/share/outside.txt",
+        )
+        for value in values:
+            with self.subTest(value=value):
+                with tempfile.TemporaryDirectory() as directory:
+                    descriptor = descriptor_with_local_references()
+                    descriptor["guide_uri"] = value
+                    descriptor_path = self.write_descriptor(Path(directory), descriptor)
+
+                    findings, _ = audit(descriptor_path)
+
+                self.assertTrue(
+                    any(
+                        finding.code == "AKBA001" and finding.pointer == "/guide_uri"
+                        for finding in findings
+                    )
+                )
+
     def test_symlink_outside_working_copy_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -477,6 +500,31 @@ class AuditWorkingCopyTests(unittest.TestCase):
         self.assertEqual(payload["summary"]["errors"], 1)
         self.assertEqual(payload["findings"][0]["code"], "AKBA000")
 
+    def test_cli_descriptor_load_failure_has_complete_summary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            descriptor_path = Path(directory) / "openakb.json"
+            descriptor_path.write_text("{", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(AUDIT_SCRIPT),
+                    "--dir",
+                    str(descriptor_path),
+                    "--format",
+                    "json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["summary"]["errors"], 1)
+        self.assertEqual(payload["summary"]["warnings"], 0)
+        self.assertEqual(payload["findings"][0]["code"], "AKBA000")
+
     def test_present_local_blob_hash_and_length_are_recomputed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -611,6 +659,41 @@ class AuditWorkingCopyTests(unittest.TestCase):
 
         self.assertTrue(any(finding.code == "AKBA044" for finding in findings))
         self.assertTrue(any(finding.code == "AKBA048" for finding in findings))
+
+    def test_non_utf8_provenance_returns_structured_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor_path = self.materialize_valid_references(
+                root, descriptor_with_local_references()
+            )
+            provenance_path = root / "sections/SEC-000001/provenance.json"
+            provenance_bytes = b"\xff"
+            provenance_path.write_bytes(provenance_bytes)
+            descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+            section = descriptor["sections"][0]
+            section["provenance_hash"] = stamp(provenance_bytes)
+            section["provenance_length"] = len(provenance_bytes)
+            descriptor_path = self.write_descriptor(root, descriptor)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(AUDIT_SCRIPT),
+                    "--dir",
+                    str(descriptor_path),
+                    "--format",
+                    "json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(
+            any(finding["code"] == "AKBA032" for finding in payload["findings"])
+        )
 
     def test_stamps_only_content_still_validates_byte_ranges(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

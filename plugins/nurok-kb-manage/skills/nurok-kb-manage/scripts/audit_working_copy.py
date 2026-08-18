@@ -11,7 +11,7 @@ import json
 import re
 from collections import defaultdict
 from dataclasses import asdict, dataclass
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -73,10 +73,11 @@ def find_descriptor(value: Path) -> Path:
 
 def resolve_local_uri(root: Path, value: str) -> Path | None:
     parsed = urlsplit(value)
+    windows_path = PureWindowsPath(value)
+    if parsed.scheme.lower() == "file" or value.startswith("/") or windows_path.drive:
+        raise ValueError("local URI must not use an absolute filesystem form")
     if parsed.scheme or parsed.netloc:
         return None
-    if value.startswith("/"):
-        raise ValueError("local URI must not be absolute")
     if not parsed.path or parsed.query or parsed.fragment or "\\" in parsed.path:
         raise ValueError("local URI must be a canonical relative path")
 
@@ -433,7 +434,7 @@ def audit_provenance(
 ) -> None:
     try:
         provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         add_finding(
             findings,
             "AKBA032",
@@ -1052,29 +1053,11 @@ def main() -> int:
 
     try:
         findings, summary = audit(descriptor_path)
-    except (OSError, json.JSONDecodeError) as error:
-        if args.format == "json":
-            print(
-                json.dumps(
-                    {
-                        "summary": {"descriptor": str(descriptor_path)},
-                        "findings": [
-                            asdict(
-                                Finding(
-                                    "AKBA000",
-                                    "error",
-                                    "/",
-                                    f"cannot load descriptor: {error}",
-                                )
-                            )
-                        ],
-                    },
-                    ensure_ascii=False,
-                    indent=2,
-                )
-            )
-        else:
-            print(f"ERROR AKBA000 /: cannot load {descriptor_path}: {error}")
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        findings, summary = invalid_descriptor_result(
+            descriptor_path, "/", f"cannot load descriptor: {error}"
+        )
+        print_report(findings, summary, args.format)
         return 2
 
     if args.compare_dir is not None:

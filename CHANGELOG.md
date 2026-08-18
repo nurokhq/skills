@@ -24,3 +24,7 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 - Return structured audit findings for non-string Source types.
 - Validate provenance byte ranges even when Section content is available only by stamp.
 - Require DCO sign-offs regardless of the commit's user-controlled author name.
+- Reject file URIs and platform-absolute filesystem paths outside the working root.
+- Report non-UTF-8 provenance sidecars as structured audit findings.
+- Preserve complete summary counts when a descriptor cannot be loaded.
+- Run distribution and plugin-version checks against the pull request base in CI.

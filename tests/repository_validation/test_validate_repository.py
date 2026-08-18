@@ -6,9 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-VALIDATOR_PATH = (
-    Path(__file__).resolve().parents[2] / "scripts" / "ci" / "validate_repository.py"
-)
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+VALIDATOR_PATH = REPOSITORY_ROOT / "scripts" / "ci" / "validate_repository.py"
 validator = runpy.run_path(str(VALIDATOR_PATH))
 validate_read_only_skill = validator["validate_read_only_skill"]
 validate_skill_links = validator["validate_skill_links"]
@@ -35,6 +34,16 @@ class RepositoryValidationTests(unittest.TestCase):
             validate_read_only_skill(skill_root, errors)
 
         self.assertEqual(errors, [])
+
+    def test_ci_runs_distribution_checks_against_pull_request_base(self) -> None:
+        workflow = (REPOSITORY_ROOT / ".github" / "workflows" / "ci.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("scripts/ci/verify_skill_distribution.py", workflow)
+        self.assertIn("github.event.pull_request.base.sha", workflow)
+        self.assertIn("--base-ref", workflow)
+        self.assertIn("fetch-depth: 0", workflow)
 
     def test_mutating_command_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
