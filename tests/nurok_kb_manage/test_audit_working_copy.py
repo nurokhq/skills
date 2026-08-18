@@ -180,6 +180,29 @@ class AuditWorkingCopyTests(unittest.TestCase):
             },
         )
 
+    def test_existing_non_file_reference_is_an_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "AKB.md").mkdir()
+            descriptor_path = self.write_descriptor(
+                root, descriptor_with_local_references()
+            )
+
+            findings, _ = audit(descriptor_path)
+
+        self.assertTrue(
+            any(
+                finding.code == "AKBA007" and finding.pointer == "/guide_uri"
+                for finding in findings
+            )
+        )
+        self.assertFalse(
+            any(
+                finding.code == "AKBA002" and finding.pointer == "/guide_uri"
+                for finding in findings
+            )
+        )
+
     def test_missing_guide_without_stamps_is_an_error(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -641,6 +664,63 @@ class AuditWorkingCopyTests(unittest.TestCase):
         self.assertTrue(any(finding.code == "AKBA038" for finding in findings))
         self.assertTrue(any(finding.code == "AKBA039" for finding in findings))
         self.assertTrue(any(finding.code == "AKBA040" for finding in findings))
+
+    def test_provenance_ranges_must_match_their_source_blocks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor_path = self.materialize_valid_references(
+                root, descriptor_with_local_references()
+            )
+            path = root / "sections/SEC-000001/provenance.json"
+            provenance = json.loads(path.read_text(encoding="utf-8"))
+            first, second = provenance["source_blocks"]
+            first["section_byte_range"], second["section_byte_range"] = (
+                second["section_byte_range"],
+                first["section_byte_range"],
+            )
+            path.write_text(json.dumps(provenance), encoding="utf-8")
+
+            findings, _ = audit(descriptor_path)
+
+        self.assertTrue(any(finding.code == "AKBA049" for finding in findings))
+
+    def test_provenance_ranges_must_not_be_empty(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            descriptor_path = self.materialize_valid_references(
+                root, descriptor_with_local_references()
+            )
+            path = root / "sections/SEC-000001/provenance.json"
+            provenance = json.loads(path.read_text(encoding="utf-8"))
+            provenance["source_blocks"][0]["section_byte_range"] = {
+                "start": 0,
+                "end": 0,
+            }
+            path.write_text(json.dumps(provenance), encoding="utf-8")
+
+            findings, _ = audit(descriptor_path)
+
+        self.assertTrue(any(finding.code == "AKBA040" for finding in findings))
+
+    def test_claims_must_be_an_array_of_objects(self) -> None:
+        cases = (({}, "AKBA064"), (["not-an-object"], "AKBA065"))
+        for claims, expected_code in cases:
+            with self.subTest(claims=claims):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    descriptor_path = self.materialize_valid_references(
+                        root, descriptor_with_local_references()
+                    )
+                    path = root / "sections/SEC-000001/provenance.json"
+                    provenance = json.loads(path.read_text(encoding="utf-8"))
+                    provenance["claims"] = claims
+                    path.write_text(json.dumps(provenance), encoding="utf-8")
+
+                    findings, _ = audit(descriptor_path)
+
+                self.assertTrue(
+                    any(finding.code == expected_code for finding in findings)
+                )
 
     def test_provenance_requires_capture_stamps_and_byte_range(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

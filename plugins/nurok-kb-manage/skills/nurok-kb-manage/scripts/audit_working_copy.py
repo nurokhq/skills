@@ -277,7 +277,16 @@ def audit_local_reference(
 
     stamps = complete_stamps(value, hash_key, length_key)
     if not local_path.is_file():
-        if stamps is not None:
+        unresolved_path = root / Path(*PurePosixPath(uri).parts)
+        if local_path.exists() or unresolved_path.is_symlink():
+            add_finding(
+                findings,
+                "AKBA007",
+                "error",
+                pointer,
+                f"local URI {uri!r} exists but is not a regular file",
+            )
+        elif stamps is not None:
             add_finding(
                 findings,
                 "AKBA002",
@@ -355,10 +364,16 @@ def audit_content_markers(
     section_pointer: str,
     descriptor_source_ids: list[str],
     findings: list[Finding],
-) -> list[str]:
+) -> tuple[list[str], list[tuple[int, int]]]:
     content = content_path.read_text(encoding="utf-8")
-    block_ids = [
-        match.group(1).lower() for match in SOURCE_BLOCK_PATTERN.finditer(content)
+    block_matches = list(SOURCE_BLOCK_PATTERN.finditer(content))
+    block_ids = [match.group(1).lower() for match in block_matches]
+    block_ranges = [
+        (
+            len(content[: match.start()].encode("utf-8")),
+            len(content[: match.end()].encode("utf-8")),
+        )
+        for match in block_matches
     ]
     citation_ids = [
         match.group(1).lower() for match in CITATION_PATTERN.finditer(content)
@@ -390,7 +405,7 @@ def audit_content_markers(
             expected=block_ids,
             actual=descriptor_source_ids,
         )
-    return block_ids
+    return block_ids, block_ranges
 
 
 def audit_provenance_source_ids(
@@ -428,6 +443,7 @@ def audit_provenance(
     pointer: str,
     section_id: str,
     block_ids: list[str],
+    block_ranges: list[tuple[int, int]] | None,
     content_length: int | None,
     source_stamps: dict[str, tuple[str, int]],
     findings: list[Finding],
@@ -487,6 +503,7 @@ def audit_provenance(
         )
         return
 
+    previous_range_end: int | None = None
     for index, block in enumerate(source_blocks):
         block_pointer = f"{pointer}/source_blocks/{index}"
         if not isinstance(block, dict):
@@ -596,12 +613,14 @@ def audit_provenance(
                 or isinstance(start, bool)
                 or not isinstance(end, int)
                 or isinstance(end, bool)
-                or not 0 <= start <= end
+                or not 0 <= start < end
             )
             if valid_range and content_length is not None:
                 valid_range = end <= content_length
+            if valid_range and previous_range_end is not None:
+                valid_range = start >= previous_range_end
             if not valid_range:
-                expected = "0 <= start <= end"
+                expected = "ordered, non-overlapping ranges with 0 <= start < end"
                 if content_length is not None:
                     expected += f" <= {content_length}"
                 add_finding(
@@ -613,6 +632,23 @@ def audit_provenance(
                     expected=expected,
                     actual=byte_range,
                 )
+            else:
+                previous_range_end = end
+                if block_ranges is not None and index < len(block_ranges):
+                    expected_start, expected_end = block_ranges[index]
+                    if not start <= expected_start < expected_end <= end:
+                        add_finding(
+                            findings,
+                            "AKBA049",
+                            "error",
+                            f"{block_pointer}/section_byte_range",
+                            "Section byte range must contain its content Source marker",
+                            expected={
+                                "marker_start": expected_start,
+                                "marker_end": expected_end,
+                            },
+                            actual=byte_range,
+                        )
 
     if provenance_block_ids != block_ids:
         add_finding(
@@ -626,10 +662,27 @@ def audit_provenance(
         )
 
     claims = provenance.get("claims")
-    if isinstance(claims, list):
+    if claims is not None and not isinstance(claims, list):
+        add_finding(
+            findings,
+            "AKBA064",
+            "error",
+            f"{pointer}/claims",
+            "claims must be an array",
+            actual=claims,
+        )
+    elif isinstance(claims, list):
         allowed = set(block_ids)
         for index, claim in enumerate(claims):
             if not isinstance(claim, dict):
+                add_finding(
+                    findings,
+                    "AKBA065",
+                    "error",
+                    f"{pointer}/claims/{index}",
+                    "claim must be an object",
+                    actual=claim,
+                )
                 continue
             claim_ids = normalized_source_ids(claim.get("source_ids"))
             if claim_ids is None:
@@ -918,12 +971,13 @@ def audit(descriptor_path: Path) -> tuple[list[Finding], dict[str, object]]:
         )
 
         block_ids = normalized_citations or []
+        block_ranges = None
         content_length = None
         if content_path is not None:
             content_length = content_path.stat().st_size
             if content_type == "text/markdown" and normalized_citations is not None:
                 try:
-                    block_ids = audit_content_markers(
+                    block_ids, block_ranges = audit_content_markers(
                         content_path=content_path,
                         section_pointer=pointer,
                         descriptor_source_ids=normalized_citations,
@@ -944,6 +998,7 @@ def audit(descriptor_path: Path) -> tuple[list[Finding], dict[str, object]]:
                 pointer=f"{pointer}/provenance_uri",
                 section_id=section_id,
                 block_ids=block_ids,
+                block_ranges=block_ranges,
                 content_length=content_length,
                 source_stamps=source_stamps,
                 findings=findings,

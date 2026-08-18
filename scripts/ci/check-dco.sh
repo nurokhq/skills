@@ -23,11 +23,17 @@ while IFS= read -r sha; do
   if [ -z "${signoff//[[:space:]]/}" ]; then
     echo "::error::commit $sha is missing a Signed-off-by line (DCO)"
     missing=1
+    continue
+  fi
+  author="$(git log -1 --format='%an <%ae>' "$sha")"
+  if ! grep -Fqx -- "$author" <<< "$signoff"; then
+    echo "::error::commit $sha has a Signed-off-by line that does not match commit author $author"
+    missing=1
   fi
 done <<< "$commits"
 
 if [ "$missing" -ne 0 ]; then
-  echo "One or more commits lack DCO sign-off. Fix with: git commit --amend -s (or git rebase --signoff)."
+  echo "One or more commits lack an author-matching DCO sign-off. Fix with: git commit --amend -s (or git rebase --signoff)."
   exit 1
 fi
-echo "All commits carry a DCO Signed-off-by line."
+echo "All commits carry an author-matching DCO Signed-off-by line."

@@ -56,6 +56,23 @@ class CheckDcoTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("missing a Signed-off-by", result.stdout)
 
+    def test_signoff_must_match_commit_author(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            base = self.initialize_repository(root)
+            self.git(
+                root,
+                "commit",
+                "--allow-empty",
+                "-m",
+                "Forged signoff\n\nSigned-off-by: Mallory <mallory@example.com>",
+            )
+
+            result = self.run_check(root, base)
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("does not match commit author", result.stdout)
+
     def test_signed_commit_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

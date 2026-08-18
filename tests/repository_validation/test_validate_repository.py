@@ -11,6 +11,7 @@ VALIDATOR_PATH = REPOSITORY_ROOT / "scripts" / "ci" / "validate_repository.py"
 validator = runpy.run_path(str(VALIDATOR_PATH))
 validate_read_only_skill = validator["validate_read_only_skill"]
 validate_skill_links = validator["validate_skill_links"]
+validate_skill = validator["validate_skill"]
 validate_portable_skill_markdown = validator["validate_portable_skill_markdown"]
 validate_management_guardrails = validator["validate_management_guardrails"]
 validate_original_content_guardrails = validator["validate_original_content_guardrails"]
@@ -92,6 +93,40 @@ class RepositoryValidationTests(unittest.TestCase):
             validate_skill_links(skill_root, errors)
 
         self.assertTrue(any("link escapes the skill root" in error for error in errors))
+
+    def test_symlinked_skill_root_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = self.write_skill(root, "contents\n")
+            skill_root = root / "linked-skill"
+            skill_root.symlink_to(target, target_is_directory=True)
+            errors: list[str] = []
+
+            validate_skill_links(skill_root, errors)
+
+        self.assertTrue(any("must not contain symlinks" in error for error in errors))
+
+    def test_packaged_tests_are_rejected_anywhere_in_skill_tree(self) -> None:
+        for relative in ("tests/helper.py", "scripts/unit/test_audit.py"):
+            with self.subTest(relative=relative):
+                with tempfile.TemporaryDirectory() as directory:
+                    skill_root = self.write_skill(
+                        Path(directory),
+                        "---\nname: nurok-kb-test\ndescription: Test skill\n---\n",
+                    )
+                    test_path = skill_root / relative
+                    test_path.parent.mkdir(parents=True)
+                    test_path.write_text("", encoding="utf-8")
+                    errors: list[str] = []
+
+                    validate_skill(skill_root, "test-plugin", {}, errors)
+
+                self.assertTrue(
+                    any(
+                        "keep tests under repository tests/" in error
+                        for error in errors
+                    )
+                )
 
     def test_host_specific_skill_mention_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

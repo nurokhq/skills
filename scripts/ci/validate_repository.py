@@ -110,6 +110,11 @@ def validate_agent_yaml(skill_root: Path, skill_name: str, errors: list[str]) ->
 
 
 def validate_skill_links(skill_root: Path, errors: list[str]) -> None:
+    if skill_root.is_symlink():
+        errors.append(
+            f"{relative(skill_root)}: skill packages must not contain symlinks"
+        )
+        return
     resolved_root = skill_root.resolve()
     for path in sorted(skill_root.rglob("*")):
         if path.is_symlink():
@@ -191,6 +196,9 @@ def validate_skill(
     skill_owners: dict[str, Path],
     errors: list[str],
 ) -> None:
+    if skill_root.is_symlink():
+        validate_skill_links(skill_root, errors)
+        return
     path = skill_root / "SKILL.md"
     if not path.is_file():
         errors.append(f"{relative(skill_root)}: missing SKILL.md")
@@ -223,7 +231,11 @@ def validate_skill(
     validate_agent_yaml(skill_root, name, errors)
     validate_skill_links(skill_root, errors)
     validate_portable_skill_markdown(skill_root, errors)
-    if any((skill_root / "scripts").glob("test_*.py")):
+    if any(
+        "tests" in path.relative_to(skill_root).parts
+        or (path.is_file() and path.suffix == ".py" and path.name.startswith("test_"))
+        for path in skill_root.rglob("*")
+    ):
         errors.append(f"{relative(skill_root)}: keep tests under repository tests/")
     if plugin_name == "nurok-kb":
         validate_read_only_skill(skill_root, errors)
