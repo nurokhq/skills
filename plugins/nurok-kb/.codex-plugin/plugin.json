@@ -1,7 +1,7 @@
 {
   "name": "nurok-kb",
   "version": "0.1.0",
-  "description": "Read, search, inspect, and synthesize Nurok knowledge bases without changing remote state.",
+  "description": "Read, search, inspect, and synthesize Nurok knowledge bases through the CLI or MCP without changing remote state.",
   "author": {
     "name": "Nurok",
     "email": "support@nurok.ai",
@@ -13,14 +13,16 @@
   "keywords": [
     "agent-skills",
     "knowledge-base",
+    "mcp",
     "nurok",
     "search"
   ],
   "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Nurok KB",
-    "shortDescription": "Search and inspect Nurok knowledge bases",
-    "longDescription": "Search sections, inspect metadata and revisions, retrieve published artifacts, and synthesize answers from Nurok knowledge bases without changing remote state.",
+    "shortDescription": "Search Nurok KBs through CLI or MCP",
+    "longDescription": "Read and search Nurok KBs with the CLI by default or the bundled read-only MCP server when requested or needed, then answer from revision-pinned evidence.",
     "developerName": "Nurok",
     "category": "Developer Tools",
     "capabilities": [
@@ -29,7 +31,7 @@
     ],
     "websiteURL": "https://github.com/nurokhq/skills",
     "defaultPrompt": [
-      "Answer a question from a Nurok knowledge base.",
+      "Answer from a Nurok KB using CLI by default and read-only MCP when needed.",
       "Search a Nurok KB and cite the relevant sections.",
       "Inspect a Nurok KB's metadata and revision history."
     ]

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "nurok": {
+      "type": "http",
+      "url": "https://mcp.nurok.ai/mcp"
+    }
+  }
+}
