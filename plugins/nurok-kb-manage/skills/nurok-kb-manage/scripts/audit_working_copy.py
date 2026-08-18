@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import binascii
 import hashlib
 import json
 import re
@@ -101,14 +102,23 @@ def complete_stamps(
     content_hash = value.get(hash_key)
     content_length = value.get(length_key)
     if (
-        isinstance(content_hash, str)
-        and content_hash
+        valid_sha256_stamp(content_hash)
         and isinstance(content_length, int)
         and not isinstance(content_length, bool)
         and content_length >= 0
     ):
         return content_hash, content_length
     return None
+
+
+def valid_sha256_stamp(value: object) -> bool:
+    if not isinstance(value, str) or not value.startswith("sha256-"):
+        return False
+    try:
+        digest = base64.b64decode(value.removeprefix("sha256-"), validate=True)
+    except (ValueError, binascii.Error):
+        return False
+    return len(digest) == hashlib.sha256().digest_size
 
 
 def sha256_stamp(contents: bytes) -> str:
@@ -1001,6 +1011,35 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def update_summary_counts(findings: list[Finding], summary: dict[str, object]) -> None:
+    findings.sort(
+        key=lambda item: (item.pointer, item.severity, item.code, item.message)
+    )
+    summary["errors"] = sum(finding.severity == "error" for finding in findings)
+    summary["warnings"] = sum(finding.severity == "warning" for finding in findings)
+
+
+def print_report(
+    findings: list[Finding], summary: dict[str, object], output_format: str
+) -> None:
+    if output_format == "json":
+        print(
+            json.dumps(
+                {
+                    "summary": summary,
+                    "findings": [asdict(finding) for finding in findings],
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    else:
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+        for finding in findings:
+            print(f"{finding.severity.upper()} {finding.code} {finding.render()}")
+        print(f"audit: {summary['errors']} error(s), {summary['warnings']} warning(s)")
+
+
 def main() -> int:
     args = parse_args()
     descriptor_path = find_descriptor(args.dir)
@@ -1038,57 +1077,28 @@ def main() -> int:
             primary_descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
             compared_descriptor = json.loads(compared_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as error:
-            if args.format == "json":
-                print(
-                    json.dumps(
-                        {
-                            "summary": summary,
-                            "findings": [
-                                asdict(
-                                    Finding(
-                                        "AKBA063",
-                                        "error",
-                                        "/compare_dir",
-                                        f"cannot load compared descriptor: {error}",
-                                    )
-                                )
-                            ],
-                        },
-                        ensure_ascii=False,
-                        indent=2,
-                    )
-                )
-            else:
-                print(f"ERROR AKBA063 /compare_dir: {error}")
+            add_finding(
+                findings,
+                "AKBA063",
+                "error",
+                "/compare_dir",
+                f"cannot load compared descriptor: {error}",
+            )
+            update_summary_counts(findings, summary)
+            print_report(findings, summary, args.format)
             return 2
         if not isinstance(primary_descriptor, dict) or not isinstance(
             compared_descriptor, dict
         ):
-            if args.format == "json":
-                print(
-                    json.dumps(
-                        {
-                            "summary": summary,
-                            "findings": [
-                                asdict(
-                                    Finding(
-                                        "AKBA063",
-                                        "error",
-                                        "/compare_dir",
-                                        "both compared descriptors must be objects",
-                                    )
-                                )
-                            ],
-                        },
-                        ensure_ascii=False,
-                        indent=2,
-                    )
-                )
-            else:
-                print(
-                    "ERROR AKBA063 /compare_dir: both compared descriptors "
-                    "must be objects"
-                )
+            add_finding(
+                findings,
+                "AKBA063",
+                "error",
+                "/compare_dir",
+                "both compared descriptors must be objects",
+            )
+            update_summary_counts(findings, summary)
+            print_report(findings, summary, args.format)
             return 2
         primary_projection = descriptor_projection(descriptor_path, primary_descriptor)
         compared_projection = descriptor_projection(compared_path, compared_descriptor)
@@ -1109,28 +1119,9 @@ def main() -> int:
             summary["compared_aggregate_digest"] = aggregate_projection_digest(
                 compared_projection
             )
-        findings.sort(
-            key=lambda item: (item.pointer, item.severity, item.code, item.message)
-        )
-        summary["errors"] = sum(finding.severity == "error" for finding in findings)
-        summary["warnings"] = sum(finding.severity == "warning" for finding in findings)
+        update_summary_counts(findings, summary)
 
-    if args.format == "json":
-        print(
-            json.dumps(
-                {
-                    "summary": summary,
-                    "findings": [asdict(finding) for finding in findings],
-                },
-                ensure_ascii=False,
-                indent=2,
-            )
-        )
-    else:
-        print(json.dumps(summary, ensure_ascii=False, indent=2))
-        for finding in findings:
-            print(f"{finding.severity.upper()} {finding.code} {finding.render()}")
-        print(f"audit: {summary['errors']} error(s), {summary['warnings']} warning(s)")
+    print_report(findings, summary, args.format)
     return 1 if summary["errors"] else 0
 
 

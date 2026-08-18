@@ -23,11 +23,12 @@ AUDIT_SCRIPT = (
 )
 audit = runpy.run_path(str(AUDIT_SCRIPT))["audit"]
 
-STAMP = "sha256-aGVsbG8="
-
 
 def stamp(contents: bytes) -> str:
     return f"sha256-{b64encode(sha256(contents).digest()).decode('ascii')}"
+
+
+STAMP = stamp(b"hello")
 
 
 def errors(findings: list[object]) -> list[str]:
@@ -192,6 +193,29 @@ class AuditWorkingCopyTests(unittest.TestCase):
         self.assertTrue(
             any(error.startswith("/guide_uri:") for error in errors(findings))
         )
+
+    def test_missing_guide_requires_valid_sha256_stamp(self) -> None:
+        invalid_stamps = (
+            "not-a-sha256",
+            "sha256-!!!!",
+            "sha256-aGVsbG8=",
+        )
+        for invalid_stamp in invalid_stamps:
+            with self.subTest(invalid_stamp=invalid_stamp):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    descriptor = descriptor_with_local_references()
+                    descriptor["guide_hash"] = invalid_stamp
+                    descriptor_path = self.write_descriptor(root, descriptor)
+
+                    findings, _ = audit(descriptor_path)
+
+                self.assertTrue(
+                    any(
+                        finding.code == "AKBA003" and finding.pointer == "/guide_uri"
+                        for finding in findings
+                    )
+                )
 
     def test_present_local_blobs_pass_all_checks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -655,6 +679,40 @@ class AuditWorkingCopyTests(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertTrue(
             any(finding["code"] == "AKBA062" for finding in payload["findings"])
+        )
+
+    def test_compare_dir_load_failure_preserves_primary_findings(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary = root / "primary"
+            primary.mkdir()
+            descriptor = descriptor_with_local_references()
+            descriptor.pop("guide_hash")
+            descriptor.pop("guide_length")
+            self.write_descriptor(primary, descriptor)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(AUDIT_SCRIPT),
+                    "--dir",
+                    str(primary),
+                    "--compare-dir",
+                    str(root / "missing"),
+                    "--format",
+                    "json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["summary"]["errors"], 2)
+        self.assertEqual(
+            {finding["code"] for finding in payload["findings"]},
+            {"AKBA002", "AKBA003", "AKBA063"},
         )
 
 
