@@ -1,4 +1,4 @@
 interface:
-  display_name: "Manage Nurok KBs"
+  display_name: "Nurok KB Manage"
   short_description: "Publish source-preserving Nurok knowledge bases"
   default_prompt: "Use $nurok-kb-manage to create, validate, or publish this Nurok KB with article-body-only Source blocks while preserving every retained source word and its order."

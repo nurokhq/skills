@@ -1,6 +1,6 @@
 {
   "name": "nurok-kb-capture",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Capture and refresh immutable canonical original evidence for Nurok knowledge bases.",
   "author": {
     "name": "Nurok",
