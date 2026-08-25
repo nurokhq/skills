@@ -19,9 +19,11 @@ Each plugin is standalone and declares no dependency on either of the others. In
 
 ### Ask An Agent
 
-Give a compatible coding agent this prompt, replacing the skill name when needed:
+Give a compatible coding agent one of these prompts:
 
 ```text
+Install the nurok-kb skill from https://github.com/nurokhq/skills
+Install the nurok-kb-manage skill from https://github.com/nurokhq/skills
 Install the nurok-kb-capture skill from https://github.com/nurokhq/skills
 ```
 

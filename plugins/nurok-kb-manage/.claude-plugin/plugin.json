@@ -1,6 +1,6 @@
 {
   "name": "nurok-kb-manage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create, validate, publish, and recover source-preserving Nurok knowledge bases with article-body-only Sections.",
   "author": {
     "name": "Nurok",
