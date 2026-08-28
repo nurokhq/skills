@@ -1,7 +1,7 @@
 {
   "name": "nurok-kb-manage",
-  "version": "0.1.1",
-  "description": "Create, validate, publish, and recover source-preserving Nurok knowledge bases with article-body-only Sections.",
+  "version": "0.1.2",
+  "description": "Design, create, validate, publish, and recover goal-driven, source-preserving Nurok knowledge bases.",
   "author": {
     "name": "Nurok",
     "email": "support@nurok.ai",
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Nurok KB Manage",
-    "shortDescription": "Publish source-preserving Nurok knowledge bases",
-    "longDescription": "Create, update, validate, publish, and recover Nurok knowledge bases from immutable captures using article-body-only Source blocks, original-only retained text, presentation-only Markdown, and explicit safety checks.",
+    "shortDescription": "Design and publish source-preserving Nurok KBs",
+    "longDescription": "Clarify an approved KB scope, derive and approve a goal-driven Section structure, then create, update, validate, publish, or recover source-preserving Nurok knowledge bases from immutable canonical evidence.",
     "developerName": "Nurok",
     "category": "Developer Tools",
     "capabilities": [
@@ -29,8 +29,8 @@
     ],
     "websiteURL": "https://github.com/nurokhq/skills",
     "defaultPrompt": [
-      "Create and validate a Nurok KB with article-body-only Source blocks from approved original captures.",
-      "Update and publish a Nurok KB while preserving every retained source word and Source boundary.",
+      "Clarify this KB's goal, derive a representative source-preserving Section structure for approval, then create and validate it.",
+      "Update and publish a Nurok KB while preserving every selected source word and Source boundary.",
       "Recover a failed publication without changing validated original content."
     ]
   }

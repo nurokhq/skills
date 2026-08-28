@@ -13,6 +13,25 @@ SCRIPT_PATH = (
     / "ci"
     / "verify_skill_distribution.py"
 )
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+MANAGE_PRINCIPLES_PATH = (
+    REPOSITORY_ROOT
+    / "plugins"
+    / "nurok-kb-manage"
+    / "skills"
+    / "nurok-kb-manage"
+    / "references"
+    / "principles.md"
+)
+CAPTURE_PRINCIPLES_PATH = (
+    REPOSITORY_ROOT
+    / "plugins"
+    / "nurok-kb-capture"
+    / "skills"
+    / "nurok-kb-capture"
+    / "references"
+    / "principles.md"
+)
 distribution = runpy.run_path(str(SCRIPT_PATH))
 SkillPackage = distribution["SkillPackage"]
 compare_skill_trees = distribution["compare_skill_trees"]
@@ -24,6 +43,14 @@ validate_version_bumps = distribution["validate_version_bumps"]
 
 
 class SkillDistributionTests(unittest.TestCase):
+    def test_manage_and_capture_principles_are_byte_identical(self) -> None:
+        self.assertTrue(MANAGE_PRINCIPLES_PATH.is_file())
+        self.assertTrue(CAPTURE_PRINCIPLES_PATH.is_file())
+        self.assertEqual(
+            MANAGE_PRINCIPLES_PATH.read_bytes(),
+            CAPTURE_PRINCIPLES_PATH.read_bytes(),
+        )
+
     def make_package(self, root: Path) -> object:
         canonical = root / "canonical" / "example-skill"
         (canonical / "references").mkdir(parents=True)

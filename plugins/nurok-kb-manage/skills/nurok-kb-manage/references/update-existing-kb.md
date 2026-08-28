@@ -2,6 +2,8 @@
 
 Read this reference whenever a namespace, owner/slug, KB ID, or existing remote record identifies the target.
 
+Do not block a historical KB's nonstructural repair or recovery solely because `.nurok` is absent. Preserve its established hierarchy, Section classes, mappings, and stable identities. Before changing any of those structural responsibilities, bootstrap and approve `.nurok/scope.md` and `.nurok/structure.md` through [scope-and-structure.md](scope-and-structure.md).
+
 ## Discover The Current CLI Workflow
 
 Before using the CLI, inspect the installed command surface:
@@ -42,9 +44,9 @@ Inspect revision and snapshot history rather than inferring it from the current 
 
 ## Plan The Delta
 
-Require explicit approval and a valid canonical capture for every added Source. Record added and removed documents, Source-block-to-Section mappings, included article-body ranges, structurally excluded page-chrome ranges, presentation-only formatting changes, metadata changes, provenance changes, and unexpected count changes. Keep discovery and auxiliary material outside the KB.
+Require a valid immutable capture for every added Source and confirm that it is explicitly approved or objectively satisfies the approved scope inclusion rule. A pending scope amendment cannot authorize KB inclusion. Record added and removed documents, Section-class responsibility, Source-block-to-Section mappings, exact selected ranges, structurally excluded page-chrome ranges, presentation-only formatting changes, summary-title changes, metadata changes, provenance changes, and unexpected count changes. Keep discovery and auxiliary material outside the KB.
 
-Preserve stable typed IDs, namespace, capture times, document boundaries, source order, and unchanged integrity data. Update `AKB.md` before the generator when approved Sources, Section ranges, or formatting rules change. Avoid unrelated crawler, source, document-structure, and formatting changes.
+Preserve stable typed IDs, namespace, capture times, document boundaries, Source order, and unchanged integrity data. Keep a Section ID only while its approved class and stable retrieval responsibility remain the same; mint new IDs for material responsibility changes, splits, or merges. Project approved scope or structure changes into `AKB.md` before changing the generator. Stop if `.nurok`, `AKB.md`, and `openakb.json` conflict. Avoid unrelated crawler, Source, structure, and formatting changes.
 
 ## Keep Metadata Layers Separate
 
@@ -73,11 +75,13 @@ Treat `openakb.json` as a mixed-state artifact: corpus-owned content may coexist
 - After any CLI command that may write back state, diff the actual file and structurally reconcile platform-written fields into the maintained source of truth.
 - When bytes change, treat their prior hashes and lengths as stale; when bytes do not change, preserve verified stamps.
 - Compare aggregate content hashes; count equality is not proof of content equality.
-- Compare every changed Source block's visible text with its included article-body ranges. Stop on any addition, unexplained article-body omission, replacement, reorder, interleaving, page-chrome exclusion without structural evidence, or change that is not presentation-only formatting.
+- Compare every changed Source block's visible text with its selected article-body ranges. Stop on any alteration of selected content, unexplained omission relative to the approved Section-class policy, replacement, reorder, interleaving, page-chrome exclusion without structural evidence, or change that is not presentation-only formatting.
 
 ## Synchronize The Publishing Copy
 
 Derive the publishing set from the Descriptor. Include `openakb.json` and every relative local blob referenced by `guide_uri`, section `content_uri` or `provenance_uri`, a `file` source `uri`, source `capture_uri`, or `x.ai.nurok.skill_uri`. The common simple set is `openakb.json`, `AKB.md`, and `sections/`, but it is not a complete allowlist. Do not copy unreferenced crawler code, raw archives, tests, caches, build notes, or virtual environments.
+
+Never reference or copy `.nurok` into the publishing set. It is a local build control plane, not a formal Descriptor artifact.
 
 Copy only changed artifacts, then compare the complete Descriptor projection before publication:
 
