@@ -1,6 +1,6 @@
 ---
 name: nurok-kb
-description: Read, search, inspect, and synthesize one or more Nurok knowledge bases without changing remote state. Use when listing visible KBs, checking metadata or revision history, searching and retrieving sections, reading published artifacts, answering with section-level evidence, or comparing knowledge at pinned revisions through the Nurok CLI or Nurok MCP tools.
+description: Read, search, inspect, and synthesize one or more Nurok knowledge bases without changing remote state. Use when listing visible KBs, checking metadata or revision history, searching and retrieving sections, reading published artifacts, answering with Source-level provenance, or comparing knowledge at pinned revisions through the Nurok CLI or Nurok MCP tools.
 ---
 
 # Read Nurok KBs
@@ -58,9 +58,13 @@ With the CLI, use `cat` for one published artifact at a time. Read only returned
 
 For multiple KBs, repeat the workflow independently and label evidence by canonical KB identity and revision.
 
+For an answer or synthesis that makes material claims from KB content, read and follow [the provenance workflow](references/provenance.md) before composing the response. Simple KB discovery, metadata, search-candidate, and changelog results do not require Source-level provenance unless they are used to support a knowledge claim.
+
 ## Answer From Evidence
 
-Base every material claim on retrieved Section or artifact content. Cite the canonical KB, revision, and returned Section ID or artifact path; preserve Source identities and URLs. Distinguish live metadata from pinned content, separate quotation from synthesis or inference, and disclose missing, stale, inaccessible, conflicting, or sampled coverage. Never invent citations, identifiers, or Source URLs.
+Base every material claim on retrieved Section or artifact content. Add compact inline provenance markers and a provenance list that identifies the canonical KB, revision, returned Section ID or artifact path, Source ID, original Source URI, and supported evidence granularity. Preserve returned identities and URIs exactly, and never claim finer provenance than the retrieved artifacts establish.
+
+Distinguish live metadata from pinned content, separate quotation from synthesis or inference, and disclose missing, stale, inaccessible, conflicting, or sampled coverage. Keep incompletely traced claims separate and visibly labeled. Never invent citations, identifiers, Source URLs, capture metadata, or evidence precision.
 
 ## Stay Read-Only
 

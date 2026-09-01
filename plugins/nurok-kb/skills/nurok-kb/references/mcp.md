@@ -50,4 +50,6 @@ Use `kb_search` only as a secondary exact-term aid. It may miss multilingual, pa
 
 When `kb_section_get` returns inline content, use that bounded content. When it returns only a `content_uri`, perform an MCP resource read on that exact URI. If resource reads are unavailable, use `kb_artifact` only according to its current schema and use documented offset or length fields for large content. Never invent a resource URI, artifact path, offset, or argument.
 
-Use `kb_artifact` for a structured Descriptor or one published raw artifact at a live or pinned revision. Read only returned artifact paths or URIs. Use `kb_sources_list` and `kb_source_get` only when retrieved Sections lack required Source metadata.
+Use `kb_artifact` for a structured Descriptor or one published raw artifact at a live or pinned revision. Read only returned artifact paths or URIs. Use `kb_sources_list` and `kb_source_get` when needed to resolve a Source used by the answer.
+
+For an answer or synthesis that makes material claims, follow [the provenance workflow](provenance.md) for every Section used in the response. Keep the KB and revision pinned across Section, provenance, and Source reads.

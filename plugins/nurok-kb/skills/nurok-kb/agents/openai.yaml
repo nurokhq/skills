@@ -1,4 +1,4 @@
 interface:
   display_name: "Nurok KB"
-  short_description: "Search Nurok KBs through CLI or MCP"
-  default_prompt: "Use $nurok-kb to answer from retrieved KB evidence, preferring CLI and using read-only MCP when requested or when CLI is unavailable."
+  short_description: "Read Nurok KBs with traceable evidence"
+  default_prompt: "Use $nurok-kb to answer from retrieved KB evidence with compact provenance for every material claim, preferring CLI and using read-only MCP when needed."
