@@ -62,6 +62,10 @@ Treat source pointer visibility and KB visibility independently. Descriptor Sour
 4. Update only confirmed mismatches with the reference form accepted by the installed CLI.
 5. Collect per-source failures and verify the remote results.
 
+Recommend public pointer visibility for a Source of type `url` when its canonical URL and identifying metadata are already public and safe to disclose. Record a private-pointer mismatch for authorized correction, but do not treat the recommendation or local publication preparation as authority to mutate the remote Source registry.
+
+For every private Source, inspect each changed or published provenance artifact and remove its canonical or capture URL, title, provider or owner name, filename or path, visible Source-block label, and any other source-identifying information. Retain only its opaque stable Source ID and the Section, block, range, and order mapping required for deterministic traceability. Do not preserve identifying provenance merely because the KB is private.
+
 Never derive a registry identity from `sources[].id`. Do not make the KB public merely because evidence pointers are public. Discover and use a separate current CLI operation for any authorized KB visibility change, then verify the returned target and visibility.
 
 ## Protect `openakb.json`

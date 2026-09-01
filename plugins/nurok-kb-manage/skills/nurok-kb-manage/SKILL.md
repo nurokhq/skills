@@ -76,5 +76,7 @@ Do not select create solely because `namespace` is missing. Check the authentica
 - Keep Section IDs stable only while their approved Section class and stable retrieval responsibility remain the same. Mint new IDs for material responsibility changes, splits, or merges.
 - Keep `AKB.md` synchronized from approved contracts, not as a competing approval record. Treat `openakb.json` as authoritative for formal entities and file projection.
 - Keep source pointer visibility independent from KB record visibility. Public evidence does not make the KB public.
+- Recommend public Source-pointer visibility for a `url` Source when its canonical URL and identifying metadata are already public and safe to disclose. A recommendation does not authorize remote mutation.
+- Keep private-Source provenance non-identifying. Use only an opaque stable Source ID and the evidence mapping required for deterministic traceability; never include the Source URL, title, provider, filename or path, or any other source-identifying information.
 - Preserve verified namespace, remote binding, revision baseline, historical evidence, and resumable drafts.
 - Never bypass validation, omit a referenced artifact, expose credentials or private content, or claim verification that was not performed.

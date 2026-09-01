@@ -78,7 +78,9 @@ For public evidence intended for audience citation, declare pointer visibility o
 }
 ```
 
-Do not infer KB record visibility from source visibility.
+Prefer public pointer visibility for a Source of type `url` when its canonical URL and identifying metadata are already public and safe to disclose. Treat this as a recommendation, not as authority to mutate a remote Source registry. Do not infer KB record visibility from Source visibility.
+
+For every private Source, keep provenance artifacts non-identifying. Refer to the Source only by its opaque stable Source ID and preserve the Section, block, range, and order mapping required for deterministic traceability. Never copy its canonical or capture URL, title, provider or owner name, filename or path, visible Source-block label, or any other source-identifying information into provenance. A private KB does not relax this rule.
 
 ## Select And Format Section Content
 
