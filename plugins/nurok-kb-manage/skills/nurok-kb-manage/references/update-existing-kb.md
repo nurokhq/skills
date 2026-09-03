@@ -54,7 +54,7 @@ Treat Descriptor metadata and remote KB-record metadata as independent states. B
 
 Metadata mutation and snapshot publication may not be transactional. Save both baselines before mutation. After any failure, re-read both states and report partial success before retrying or reverting anything.
 
-Treat source pointer visibility and KB visibility independently. Descriptor Source IDs such as `SRC-000001` are local OpenAKB citation identities; they are not Nurok registry Source identities. When registry correction is authorized:
+Apply [Source disclosure](source-disclosure.md) before inspecting or changing pointers or provenance. When registry correction is authorized:
 
 1. Inspect the current source-registry command help.
 2. Obtain each `registry_source_identity` from verified registry list or get results for the intended endpoint, owner, and KB.
@@ -62,11 +62,11 @@ Treat source pointer visibility and KB visibility independently. Descriptor Sour
 4. Update only confirmed mismatches with the reference form accepted by the installed CLI.
 5. Collect per-source failures and verify the remote results.
 
-Recommend public pointer visibility for a Source of type `url` when its canonical URL and identifying metadata are already public and safe to disclose. Record a private-pointer mismatch for authorized correction, but do not treat the recommendation or local publication preparation as authority to mutate the remote Source registry.
+Record confirmed Source-pointer mismatches for authorized correction, but do not treat a recommendation or local publication preparation as authority to mutate the remote Source registry.
 
-For every private Source, inspect each changed or published provenance artifact and remove its canonical or capture URL, title, provider or owner name, filename or path, visible Source-block label, and any other source-identifying information. Retain only its opaque stable Source ID and the Section, block, range, and order mapping required for deterministic traceability. Do not preserve identifying provenance merely because the KB is private.
+Before publication, complete the Source-disclosure check for every changed provenance artifact.
 
-Never derive a registry identity from `sources[].id`. Do not make the KB public merely because evidence pointers are public. Discover and use a separate current CLI operation for any authorized KB visibility change, then verify the returned target and visibility.
+Discover and use a separate current CLI operation for any separately authorized KB visibility change, then verify the returned target and visibility.
 
 ## Protect `openakb.json`
 
@@ -79,7 +79,7 @@ Treat `openakb.json` as a mixed-state artifact: corpus-owned content may coexist
 - After any CLI command that may write back state, diff the actual file and structurally reconcile platform-written fields into the maintained source of truth.
 - When bytes change, treat their prior hashes and lengths as stale; when bytes do not change, preserve verified stamps.
 - Compare aggregate content hashes; count equality is not proof of content equality.
-- Compare every changed Source block's visible text with its selected article-body ranges. Stop on any alteration of selected content, unexplained omission relative to the approved Section-class policy, replacement, reorder, interleaving, page-chrome exclusion without structural evidence, or change that is not presentation-only formatting.
+- Apply the [final Section verification](original-content-and-sections.md#verify-every-build) to every changed Source block.
 
 ## Synchronize The Publishing Copy
 

@@ -62,6 +62,7 @@ The Source label only distinguishes blocks. It is not a generated summary, inter
 For every Section:
 
 - list every represented Source exactly once in Descriptor `source_ids` and in block order;
+- keep Source-block markers, inline citations, Descriptor `source_ids`, provenance `source_ids`, and provenance `source_blocks[].source_id` in the same order;
 - keep each Source in its own visible block;
 - map each block to exactly one Source and its ordered selected and excluded ranges;
 - preserve original order within each block;
@@ -102,5 +103,7 @@ Formatting markers are not Source text. When formatting prevents byte equality, 
 ## Verify Every Build
 
 Review Source approval, capture availability, Section-class responsibility, complete `source_ids`, Source-block boundaries, exact selected and excluded ranges, block order, duplicate canonical URIs, title support, provenance gaps, and content differences.
+
+Immediately after generating or regenerating a Section file, run the KB project's configured Markdown formatting or lint tool against it. Fix every formatting error and rerun the same tool until it passes. If the tool is absent, stop; do not substitute an unrelated check or let an automatic fix change Source text.
 
 Compare each block's visible Source text with its selected ranges. Treat any unexplained addition, omission required by the class policy, replacement, reorder, interleaving, unsupported page-chrome exclusion, inferred Section title, or cross-Source synthesis as blocking.

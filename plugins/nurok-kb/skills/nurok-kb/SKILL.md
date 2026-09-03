@@ -58,13 +58,7 @@ With the CLI, use `cat` for one published artifact at a time. Read only returned
 
 For multiple KBs, repeat the workflow independently and label evidence by canonical KB identity and revision.
 
-For an answer or synthesis that makes material claims from KB content, read and follow [the provenance workflow](references/provenance.md) before composing the response. Simple KB discovery, metadata, search-candidate, and changelog results do not require Source-level provenance unless they are used to support a knowledge claim.
-
-## Answer From Evidence
-
-Base every material claim on retrieved Section or artifact content. Add compact inline provenance markers and a provenance list that identifies the canonical KB, revision, returned Section ID or artifact path, Source ID, original Source URI, and supported evidence granularity. Preserve returned identities and URIs exactly, and never claim finer provenance than the retrieved artifacts establish.
-
-Distinguish live metadata from pinned content, separate quotation from synthesis or inference, and disclose missing, stale, inaccessible, conflicting, or sampled coverage. Keep incompletely traced claims separate and visibly labeled. Never invent citations, identifiers, Source URLs, capture metadata, or evidence precision.
+Before composing an answer or synthesis with material KB claims, read and complete [the provenance workflow](references/provenance.md). It owns the evidence-chain, granularity, Source-disclosure, and degradation rules. Simple KB discovery, metadata, search-candidate, and changelog results do not require Source-level provenance unless they support a knowledge claim.
 
 ## Stay Read-Only
 

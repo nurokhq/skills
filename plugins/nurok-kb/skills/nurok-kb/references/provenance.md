@@ -8,7 +8,7 @@ Pin all reads that support one answer to the same canonical KB and revision. For
 
 1. Retrieve the Section content rather than relying on a search hit.
 2. Resolve the Section's returned or Descriptor-declared `provenance_uri` without inventing a path, and read that provenance artifact at the pinned revision.
-3. Resolve every material `source_id` to its published Source metadata. Preserve the returned Source ID, type, URI, capture timestamp, and capture metadata exactly.
+3. Resolve every material `source_id` to its published Source metadata. Treat a Source as public unless the retrieved Descriptor or verified returned Source-registry state explicitly marks it private; any explicit private marker wins. Never infer Source visibility from KB record visibility. Preserve a public Source's returned ID, type, URI, capture timestamp, and capture metadata. Key an explicitly private Source only by its opaque stable Source ID and non-identifying Section, block, range, and order mapping. If the required metadata cannot be resolved, record the missing link and classify the evidence as incomplete.
 4. Record the answer claim, KB, revision, Section, provenance entry, and Source as one evidence chain.
 
 With the CLI, use `nurok kb section get` for the Section and cited Source metadata. Use `nurok kb cat` at the same revision to read `openakb.json` or one returned provenance artifact when required. Owner Source-registry commands remain outside this skill's read boundary.
@@ -28,6 +28,10 @@ Assign the finest level actually established by the retrieved artifacts:
 
 Do not describe Section-level or Source-block-level evidence as claim-level support. A hash proves byte identity, not truth, authority, or semantic support.
 
+## Preserve Answer Integrity
+
+Label live metadata separately from revision-pinned content. Distinguish quotation and paraphrase from synthesis or inference, and disclose sampled or otherwise limited coverage. Preserve returned identities and disclosed URIs exactly. Never invent citations, identifiers, Source URLs, capture metadata, or evidence precision.
+
 ## Present Compact Provenance
 
 Place compact markers such as `[P1]` immediately after each material claim or tightly related claim group. Reuse a marker only when the claims have the same evidence chain. One marker may name multiple Sources when they jointly support the claim.
@@ -36,10 +40,14 @@ Add a `Provenance` section after the answer. For each marker, show by default:
 
 - canonical KB identity and pinned revision;
 - Section ID or published artifact path;
-- every supporting Source ID and original URI;
+- every supporting Source ID;
 - evidence granularity.
 
-Show capture timestamps, capture URIs, hashes, provenance artifact paths, and byte ranges only when the user requests expanded provenance or when they are necessary to explain a conflict or limitation. Preserve non-HTTP and redacted Source identities as returned; do not manufacture public links.
+For every public Source, also show its original URI. For every explicitly private Source, show no URL, title, provider or owner name, filename or path, visible label, or other source-identifying information. Expanded provenance for an explicitly private Source may add only the non-identifying Section, block, range, and order mapping required for deterministic traceability.
+
+When the user directly requests identifying metadata for an explicitly private Source, state briefly that the Source is private and omit the requested metadata.
+
+For public Sources, show capture timestamps, capture URIs, hashes, provenance artifact paths, and byte ranges only when the user requests expanded provenance or when they are necessary to explain a conflict or limitation. Preserve public non-HTTP Source identities and already-redacted identifiers as returned; do not manufacture public links.
 
 For example:
 
@@ -51,6 +59,10 @@ The material claim appears here. [P1]
 - [P1] `owner/kb@revision`
   - Section: `SEC-000001`
   - Source: `SRC-000001` — `https://example.com/source`
+  - Evidence: `source-block`
+- [P2] `owner/kb@revision`
+  - Section: `SEC-000002`
+  - Source: `SRC-000002` (private)
   - Evidence: `source-block`
 ```
 

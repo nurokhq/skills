@@ -1,4 +1,4 @@
 interface:
   display_name: "Nurok KB Capture"
-  short_description: "Capture immutable original KB evidence"
-  default_prompt: "Use $nurok-kb-capture to capture or refresh this approved canonical original without transforming its content."
+  short_description: "Inspect or capture immutable KB evidence"
+  default_prompt: "Use $nurok-kb-capture to inspect existing capture state or capture or refresh this approved canonical original without transforming its content."
