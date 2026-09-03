@@ -1,6 +1,6 @@
 ---
 name: nurok-kb
-description: Read, search, inspect, and synthesize one or more Nurok knowledge bases without changing remote state. Use when listing visible KBs, checking metadata or revision history, searching and retrieving sections, reading published artifacts, answering with section-level evidence, or comparing knowledge at pinned revisions through the Nurok CLI or Nurok MCP tools.
+description: Read, search, inspect, and synthesize one or more Nurok knowledge bases without changing remote state. Use when listing visible KBs, checking metadata or revision history, searching and retrieving sections, reading published artifacts, answering with Source-level provenance, or comparing knowledge at pinned revisions through the Nurok CLI or Nurok MCP tools.
 ---
 
 # Read Nurok KBs
@@ -58,9 +58,7 @@ With the CLI, use `cat` for one published artifact at a time. Read only returned
 
 For multiple KBs, repeat the workflow independently and label evidence by canonical KB identity and revision.
 
-## Answer From Evidence
-
-Base every material claim on retrieved Section or artifact content. Cite the canonical KB, revision, and returned Section ID or artifact path; preserve Source identities and URLs. Distinguish live metadata from pinned content, separate quotation from synthesis or inference, and disclose missing, stale, inaccessible, conflicting, or sampled coverage. Never invent citations, identifiers, or Source URLs.
+Before composing an answer or synthesis with material KB claims, read and complete [the provenance workflow](references/provenance.md). It owns the evidence-chain, granularity, Source-disclosure, and degradation rules. Simple KB discovery, metadata, search-candidate, and changelog results do not require Source-level provenance unless they support a knowledge claim.
 
 ## Stay Read-Only
 

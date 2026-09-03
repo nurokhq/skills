@@ -1,77 +1,100 @@
 # <Knowledge Base Title>
 
-<One-sentence description of the approved canonical original documents preserved by this knowledge base.>
+<One-sentence description of the approved topic, audience, use, corpus boundary, and provenance without claims about Source content.>
 
-## Scope Contract
+This guide is the human-readable projection of the approved scope and structure for this KB revision.
 
-This KB preserves <approved canonical original documents> for verbatim retrieval by <audience>, within <explicit boundaries>.
+## Goal And Scope
 
-### Approved Canonical Originals
+- **Core goal:** <What users should retrieve, read, or accomplish>
+- **Audience and primary use:** <Approved audience and use>
+- **Approved corpus boundary:** <Objective, reproducible inclusion boundary>
+- **Explicit exclusions:** <Material that remains outside the KB>
+- **Source approval rule:** <Explicit per-Source approval or approved objective inclusion rule>
 
-| Source | Canonical URI | Capture | Document Boundary | Approval |
+Do not describe a predefined organization mode. Keep discovery notes, auxiliary evidence, analysis, and other derived material outside the KB.
+
+### Optional Finite-Corpus Manifest
+
+Use this table only when the approved corpus is finite and listing every Source is useful. The formal Source list remains `openakb.json`.
+
+| Source | Canonical URI | Immutable Capture | Document Boundary | Approval |
 | --- | --- | --- | --- | --- |
-| <Original document> | <Canonical URI> | <Hash-pinned capture> | <Whole document or explicit boundary> | <User authorization> |
+| <Canonical original> | <Canonical URI> | <Hash-pinned capture> | <Whole document or explicit boundary> | <Approval evidence> |
 
-### Excluded Discovery Material
+## Structure Contract
 
-- <Repost, translation, search result, index, or corroborating source used only to locate or verify an original>
+| Section Class | Retrieval Responsibility | Source Mapping | Content Selection | Section Title | Evidence Policy |
+| --- | --- | --- | --- | --- | --- |
+| <Class name> | <Stable responsibility> | <One-to-one, split, reused, multi-Source, or another approved mapping> | <Whole article body or exact excerpts at provable boundaries> | <Direct summary of all visible Source blocks> | <Required evidence and provenance> |
 
-### Explicit Boundaries
+Describe the approved root hierarchy, parent rules, stable Section identity rule, and representative structure. Different Section classes may use different mappings. The cases in this template are examples, not classification values.
 
-- <Included document, source type, time, or language boundary>
-- <Excluded material and why it is not an approved original>
+## Source And Content Policy
 
-## Original Content Policy
+- Use only approved canonical Sources with real immutable captures.
+- Preserve every capture completely and immutably, including canonical identity, capture time, content hash, and content length.
+- Select Source content only as permitted by the Section class. Preserve every selected word, punctuation mark, link target, paragraph boundary, and original order.
+- Never correct, translate, rewrite, paraphrase, deduplicate, reorder, or add generated transitions, comparisons, explanations, conclusions, or cross-Source inference.
+- Exclude page chrome only with structural evidence. Keep ambiguous material or hold the Source for direction.
+- Keep every Source, selected range, and resulting block deterministically traceable.
 
-- Treat each approved canonical original as one stable document boundary.
-- Preserve the immutable capture, canonical URI, publisher or author, capture time, content hash, and content length.
-- Keep discovery notes, auxiliary evidence, summaries, translations, analysis, and other derived material outside the KB.
-- Keep every immutable capture complete and unchanged.
-- Apply original-only to every retained article-body range: preserve every visible source word, punctuation mark, capitalization choice, link target, paragraph boundary, and ordering.
-- Apply article-body-only to each Source block: omit only structurally identified page chrome and retain the title once plus all article prose.
+## Section And Source-Block Presentation
 
-## Source Block Structure
+Every content Section title directly and verifiably summarizes all Source blocks visible in that Section. It must not use hidden capture content, external information, Agent knowledge, unsupported causality, evaluation, certainty, or false consensus.
 
-| Section | Source Block | Source | Original Title | Included Article-Body Ranges | Excluded Page-Chrome Ranges And Evidence | Order |
-| --- | --- | --- | --- | --- | --- | --- |
-| <Section ID> | <Stable block ID or index> | <Source ID> | <Exact original text> | <Ranges or equivalent provenance> | <Ranges plus DOM/template/repetition evidence> | <Sequence> |
+Start each independent Source block with:
 
-A Section may contain one or more Sources, and one Source may support several Sections. List every represented Source in the Section's `source_ids`. Keep each Source in an independent block; never interleave prose or add transitions, comparisons, or synthesis across blocks.
+```markdown
+<!-- source-block:<Source ID> -->
+[cite:<Source ID>]
 
-## Article-Body Selection
+## <Source identity label>
+```
 
-Keep the article title once, all article prose in original order, original headings, lists, quotations, tables, code, and meaningful captions, footnotes, references, and disclosures.
+Choose the Source identity label in this order:
 
-Exclude navigation, breadcrumbs, footers, product menus, cookie or login controls, share widgets, newsletter or subscription prompts, related-post cards, CTA labels, repeated title/byline/date/category/issue/read-time UI, interaction labels, duplicated scrape blocks, and broken UI labels only when structural evidence identifies them as outside the article body. Never exclude text merely because it seems unimportant. Keep or hold ambiguous material for review, and never alter the capture.
+1. a Source title verified from its capture;
+2. its canonical Source URL; or
+3. its stable Source ID.
 
-## Section Formatting
+The label only distinguishes the Source block; it is not a content summary. Keep each Source in a visibly separate block. Never interleave Source prose or turn multiple blocks into a synthesized narrative.
 
-Allow presentation-only Markdown that makes the original easier to read:
+When one Source block uses multiple noncontiguous excerpts, preserve their original order, separate them visibly without generated prose, and record every exact range separately. Never use one covering range for omitted intermediate content.
 
-- Add blank lines only between existing source paragraphs.
-- Render an existing title or heading with Markdown heading markers or bold markers while copying its visible text exactly.
+## Presentation-Only Formatting
+
+- Add blank lines only between existing Source paragraphs.
+- Render an existing Source title or heading with Markdown markers while copying its visible text exactly.
 - Represent existing lists, quotations, tables, links, and code with equivalent Markdown structure.
-- Split long documents only at existing paragraph or heading boundaries and retain source order.
+- Separate blocks and noncontiguous excerpts without generated explanatory text.
 
-Do not correct, rewrite, translate, summarize, paraphrase, deduplicate article prose, join or split sentences, reorder, add transitions, or insert explanations and conclusions.
+When formatting prevents byte equality, use deterministic provenance to prove that visible Source text remains the same ordered content as the selected capture ranges.
 
-When formatting prevents byte equality, record Source-block ranges or equivalent provenance that proves the visible text remains the same ordered content as the included article-body ranges.
+## Provenance Contract
+
+| Section | Source Block | Source | Selected Ranges | Excluded Page-Chrome Ranges And Evidence | Order |
+| --- | --- | --- | --- | --- | --- |
+| <Section ID> | <Stable block ID or index> | <Source ID> | <Exact ranges or equivalent provenance> | <Ranges plus DOM, template, or repetition evidence> | <Sequence> |
+
+Keep Descriptor `source_ids`, Source-block markers, inline citations, provenance Source IDs, and block order aligned.
 
 ## Update Protocol
 
-1. Confirm explicit approval and a valid immutable capture for every added Source.
-2. Update the Source-block map plus included and excluded ranges without changing unrelated Sources.
-3. Confirm that every exclusion is structurally identified page chrome and apply only the presentation formatting allowed above.
-4. Compare every Source block's visible text and order with its included article-body ranges.
-5. Regenerate deterministically, run focused tests and the bundled audit, and complete OpenAKB validation.
-6. Repeat original-content comparison on the publishing copy before push.
+1. Confirm that every added Source is approved or matches the approved inclusion rule and has valid immutable evidence.
+2. Confirm that changes remain within the approved scope, structure, Section-class responsibility, and stable identity rules.
+3. Update the Source-block map, exact selected ranges, exclusions, summary titles, and provenance without changing unrelated content.
+4. Regenerate formal artifacts deterministically from the approved contracts and declared source of truth.
+5. Compare every visible Source block with its selected ranges, run focused tests and the bundled audit, and complete current OpenAKB validation.
+6. Build and verify a separate Descriptor-projected publishing copy before any authorized push.
 
 ## Quality Gates
 
-- Every Source is an explicitly approved canonical original with a valid capture.
-- Every content Section cites all and only the Sources represented by its independent blocks.
-- Every Source block is article-body-only, maps to exactly one Source, and records included and excluded capture ranges.
-- Every Section title or heading copied from the source preserves its exact visible text.
-- Every formatting difference is presentation-only and provenance remains complete.
-- No Source block contains page chrome, an unexplained article-body omission, addition, replacement, reorder, summary, translation, interleaving, or cross-source synthesis.
-- Create and push stop on any unresolved original-content difference.
+- Every Source is approved canonical evidence with a valid immutable capture.
+- Every Section follows its approved class, mapping, evidence policy, and stable retrieval responsibility.
+- Every content Section title is supported by all and only its visible Source blocks.
+- Every Source block starts with the required marker and citation, has a non-summary Source identity label, and maps to exactly one Source.
+- Every selected or excluded range has deterministic provenance; noncontiguous excerpts use separate ranges.
+- No Source block contains alteration, unsupported omission, reordering, interleaving, summary prose, translation, or cross-Source synthesis.
+- The publishing copy contains the complete formal Descriptor projection and excludes local process artifacts.
+- Create, update, and push stop on any unresolved approval, authority, provenance, content-integrity, identity, or validation conflict.
