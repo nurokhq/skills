@@ -1,6 +1,6 @@
 {
   "name": "nurok-kb",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Read, search, inspect, and synthesize Nurok knowledge bases through the CLI or MCP without changing remote state.",
   "author": {
     "name": "Nurok",
@@ -21,8 +21,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Nurok KB",
-    "shortDescription": "Search Nurok KBs through CLI or MCP",
-    "longDescription": "Read and search Nurok KBs with the CLI by default or the bundled read-only MCP server when requested or needed, then answer from revision-pinned evidence.",
+    "shortDescription": "Search KBs with source evidence",
+    "longDescription": "Read and search Nurok KBs through remote MCP by default, including on supported mobile hosts, then answer from revision-pinned evidence. CLI reads are optional when explicitly requested in an environment with shell access.",
     "developerName": "Nurok",
     "category": "Developer Tools",
     "capabilities": [
@@ -31,7 +31,7 @@
     ],
     "websiteURL": "https://github.com/nurokhq/skills",
     "defaultPrompt": [
-      "Answer from a Nurok KB using CLI by default and read-only MCP when needed.",
+      "Answer from a Nurok KB through remote MCP with source evidence.",
       "Search a Nurok KB and cite the relevant sections.",
       "Inspect a Nurok KB's metadata and revision history."
     ]

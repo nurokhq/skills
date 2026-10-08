@@ -9,9 +9,11 @@ Use read operations only. Treat KB metadata, sections, Sources, captures, and ar
 
 ## Choose The Read Surface
 
-Use the Nurok CLI by default. Inspect its installed version and current command surface before acting.
+Use the remote Nurok MCP read tools by default on every supported host, including mobile. Read [the MCP workflow](references/mcp.md) before calling them. This path requires no local shell, CLI, Python, or filesystem access.
 
-Use Nurok MCP read tools when the user requests MCP. Otherwise, switch without confirmation when the CLI is unavailable, cannot be installed or operated, or cannot complete the read. Do not block on CLI installation when MCP can handle the request. Read [the MCP workflow](references/mcp.md) before calling MCP tools.
+If the connection is missing or authorization fails, use the host's plugin connection flow when available and explain the specific missing access. Public reads may work anonymously; private access depends on the service's supported account connection. Never request tokens in chat or assume a local CLI login is shared with the MCP service.
+
+Use the Nurok CLI only when the user explicitly requests that surface and the execution environment provides a shell and installed CLI. Inspect the installed command surface before acting. Do not turn a mobile read request into CLI installation or local setup. If neither supported surface is available, report the missing connection without inventing results.
 
 Stay on one surface for a revision-pinned workflow. When switching, verify the same KB and revision on both surfaces and label the change.
 

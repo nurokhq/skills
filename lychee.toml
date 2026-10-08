@@ -5,6 +5,7 @@ exclude_path = [
   ".git",
   ".venv",
   "node_modules",
+  "dist",
 ]
 
 include_mail = false
