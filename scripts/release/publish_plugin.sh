@@ -20,6 +20,7 @@ fi
 
 # Compare against the newest release, not only the previous commit: a queued
 # docs-only push must still publish skills from an earlier skipped CI run.
+tag="nurok-v$PLUGIN_VERSION"
 git fetch origin 'refs/tags/nurok-v*:refs/tags/nurok-v*'
 previous_tag=$(git tag --list 'nurok-v*' --sort=-version:refname | head -n 1)
 if [[ -n "$previous_tag" ]]; then
@@ -27,7 +28,9 @@ if [[ -n "$previous_tag" ]]; then
     echo "A newer or divergent plugin release already exists; skipping this run."
     exit 0
   fi
-  if git diff --quiet "$previous_tag" HEAD -- \
+  # The current tag may belong to an interrupted draft. Let the release-state
+  # check below validate it before deciding whether publication can continue.
+  if [[ "$previous_tag" != "$tag" ]] && git diff --quiet "$previous_tag" HEAD -- \
     'plugins/nurok-kb/skills/**' packaging/nurok scripts/release LICENSE; then
     echo "Plugin inputs are unchanged since $previous_tag."
     exit 0
@@ -35,7 +38,6 @@ if [[ -n "$previous_tag" ]]; then
 fi
 
 archive="nurok-$PLUGIN_VERSION.zip"
-tag="nurok-v$PLUGIN_VERSION"
 python3 - <<'PY'
 import hashlib
 import json

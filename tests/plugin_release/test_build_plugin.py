@@ -310,6 +310,22 @@ if args[:2] == ["release", "view"]:
             [call[1] for call in self.gh_calls(environment)], ["view", "upload", "edit"]
         )
 
+    def test_interrupted_draft_with_remote_tag_resumes(self) -> None:
+        environment = self.prepare_publication()
+        environment["FAKE_RELEASE_STATE"] = json.dumps(
+            {"isDraft": True, "targetCommitish": environment["GITHUB_SHA"]}
+        )
+        self.git("tag", "nurok-v0.1.23")
+        self.git("push", "-q", "origin", "refs/tags/nurok-v0.1.23")
+        self.git("tag", "-d", "nurok-v0.1.23")
+        build(self.root, self.root / "dist", "0.1.23")
+        result = self.publish(environment)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("unchanged", result.stdout)
+        self.assertEqual(
+            [call[1] for call in self.gh_calls(environment)], ["view", "upload", "edit"]
+        )
+
     def test_published_release_assets_are_not_overwritten(self) -> None:
         environment = self.prepare_publication()
         environment["FAKE_RELEASE_STATE"] = json.dumps(
@@ -319,6 +335,23 @@ if args[:2] == ["release", "view"]:
         result = self.publish(environment)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual([call[1] for call in self.gh_calls(environment)], ["view"])
+
+    def test_existing_tag_does_not_allow_invalid_release_state(self) -> None:
+        environment = self.prepare_publication()
+        self.git("tag", "nurok-v0.1.23")
+        build(self.root, self.root / "dist", "0.1.23")
+        for is_draft, target in ((False, environment["GITHUB_SHA"]), (True, "0" * 40)):
+            with self.subTest(is_draft=is_draft, target=target):
+                environment["FAKE_RELEASE_STATE"] = json.dumps(
+                    {"isDraft": is_draft, "targetCommitish": target}
+                )
+                result = self.publish(environment)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("published or targets another commit", result.stderr)
+                self.assertEqual(
+                    [call[1] for call in self.gh_calls(environment)], ["view"]
+                )
+                Path(environment["FAKE_GH_LOG"]).unlink()
 
     def test_invalid_archive_checksum_prevents_upload(self) -> None:
         environment = self.prepare_publication()
