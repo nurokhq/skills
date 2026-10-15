@@ -8,6 +8,7 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 
 - Public Nurok plugin template combining remote MCP with the canonical read skill for supported mobile, web, desktop, and Codex hosts.
 - Deterministic release archives, source provenance, main-only GitHub publication, and public-review cases with explicit submission-readiness gaps.
+- `mixed` OAuth for the public Nurok plugin through the preregistered public client `nurok-chatgpt-prod`, pinned by the release builder.
 
 - Initial open-source repository scaffold with Apache-2.0 licensing, DCO, contributor and security policies, GitHub templates, dependency updates, and CI checks.
 - Initial `0.1.0` releases of the independent `nurok-kb`, `nurok-kb-manage`, and `nurok-kb-capture` plugins with Codex and Claude Code marketplace metadata.

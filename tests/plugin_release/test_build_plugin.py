@@ -70,6 +70,18 @@ class PluginReleaseTests(unittest.TestCase):
             self.assertEqual(server["type"], "streamable-http")
             self.assertEqual(server["url"], "https://mcp.nurok.ai/mcp")
             self.assertEqual(
+                server["extensions"]["com.openai"]["auth"],
+                {
+                    "type": "mixed",
+                    "client": {
+                        "mode": "provided",
+                        "clientId": "nurok-chatgpt-prod",
+                        "tokenEndpointAuthMethod": "none",
+                    },
+                    "baseScopes": ["kb:read"],
+                },
+            )
+            self.assertEqual(
                 {
                     name.split("/")[2]
                     for name in bundle.namelist()
@@ -154,6 +166,41 @@ class PluginReleaseTests(unittest.TestCase):
         path = self.root / "packaging/nurok/mcp.json"
         value = json.loads(path.read_bytes())
         value["mcpServers"]["nurok"]["headers"] = {"Authorization": "Bearer secret"}
+        path.write_text(json.dumps(value))
+        with self.assertRaisesRegex(ValueError, "no local credentials"):
+            package_files(self.root, "0.1.23")
+
+    def test_provided_oauth_client_cannot_drift(self) -> None:
+        path = self.root / "packaging/nurok/mcp.json"
+        original = path.read_text()
+        cases = {
+            "client secret": ("client", "clientSecret", "secret"),
+            "client id": ("client", "clientId", "nurok-other"),
+            "auth method": ("client", "tokenEndpointAuthMethod", "client_secret_post"),
+            "client mode": ("client", "mode", "dynamic"),
+            "auth type": (None, "type", "oauth"),
+            "scopes": (None, "baseScopes", ["kb:read", "kb:write"]),
+            "authorization endpoint": (
+                None,
+                "authorizationUrl",
+                "https://api.nurok.ai/v1/oauth/authorize",
+            ),
+            "token endpoint": (None, "tokenUrl", "https://api.nurok.ai/v1/oauth/token"),
+            "resource": (None, "resource", "https://mcp.nurok.ai/mcp"),
+        }
+        for name, (section, key, replacement) in cases.items():
+            with self.subTest(name=name):
+                value = json.loads(original)
+                auth = value["mcpServers"]["nurok"]["extensions"]["com.openai"]["auth"]
+                (auth[section] if section else auth)[key] = replacement
+                path.write_text(json.dumps(value))
+                with self.assertRaisesRegex(ValueError, "no local credentials"):
+                    package_files(self.root, "0.1.23")
+
+    def test_auth_cannot_be_omitted(self) -> None:
+        path = self.root / "packaging/nurok/mcp.json"
+        value = json.loads(path.read_bytes())
+        del value["mcpServers"]["nurok"]["extensions"]
         path.write_text(json.dumps(value))
         with self.assertRaisesRegex(ValueError, "no local credentials"):
             package_files(self.root, "0.1.23")

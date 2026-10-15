@@ -15,6 +15,29 @@ ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = Path("packaging/nurok")
 SKILLS = ("nurok-kb",)
 SEMVER = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)")
+# The provided public OAuth client must match api-server's curated client.
+EXPECTED_MCP = {
+    "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+    "mcpServers": {
+        "nurok": {
+            "type": "streamable-http",
+            "url": "https://mcp.nurok.ai/mcp",
+            "extensions": {
+                "com.openai": {
+                    "auth": {
+                        "type": "mixed",
+                        "client": {
+                            "mode": "provided",
+                            "clientId": "nurok-chatgpt-prod",
+                            "tokenEndpointAuthMethod": "none",
+                        },
+                        "baseScopes": ["kb:read"],
+                    }
+                }
+            },
+        }
+    },
+}
 
 
 def git(root: Path, *args: str) -> str:
@@ -76,16 +99,7 @@ def package_files(root: Path, version: str) -> dict[str, bytes]:
     for key in ("logo", "composerIcon"):
         if interface[key] != "./assets/icon.png" or "assets/icon.png" not in files:
             raise ValueError(f"missing packaged {key}")
-    mcp = json.loads(files["mcp.json"])
-    if mcp != {
-        "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
-        "mcpServers": {
-            "nurok": {
-                "type": "streamable-http",
-                "url": "https://mcp.nurok.ai/mcp",
-            }
-        },
-    }:
+    if json.loads(files["mcp.json"]) != EXPECTED_MCP:
         raise ValueError("expected the remote Nurok MCP with no local credentials")
     manifest["version"] = version
     files["plugin.json"] = json_bytes(manifest)

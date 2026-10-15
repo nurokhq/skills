@@ -27,7 +27,7 @@ These checks exercised the production MCP through the existing Codex connection 
 | Revision history | Passed | Bounded changelog returned revisions `r4` and `r3` with a continuation cursor. |
 | Natural-language review cases in the installed release | Not run | Tool-level smoke checks do not prove skill activation, routing, or negative-case behavior. |
 | ChatGPT iOS/Android, macOS, Windows installation | Not run | Requires the actual installed release and supported accounts/clients. |
-| Private-account OAuth connection | Not run | No authenticated cross-device flow has been verified. |
+| Private-account OAuth connection | Not run | The package declares `mixed` auth with the provided public client `nurok-chatgpt-prod`. Portal connection, sign-in, token exchange, and authorized tool calls have not been verified. |
 
 The public fixture can evolve or disappear. Resolve it before each run, pin the returned revision, and report missing fixture access rather than inventing successful results. Negative cases remain unrun until exercised in the installed plugin.
 
@@ -37,12 +37,27 @@ The live 13 tools all declare `readOnlyHint: true`. Their `annotations` currentl
 
 - Preserve `readOnlyHint: true` and explicitly declare `destructiveHint: false`; no write functionality is needed. MCP itself makes these hints optional, but the OpenAI plugin review requires explicit annotations.
 - Declare `openWorldHint` per tool: `false` for reads confined to the managed Nurok knowledge corpus, `true` if the tool accesses arbitrary external entities or fetches arbitrary internet URLs. A remote endpoint or public KB does not by itself establish open-world behavior. Confirm the server implementation before selecting the value.
-- Declare the applicable anonymous/authenticated policy and verify the supported connection flow; do not imply private OAuth access from a working anonymous read.
+- Declare per-tool `securitySchemes` (`noauth` plus `oauth2` with `kb:read`) and return a `_meta["mcp/www_authenticate"]` challenge when an anonymous call needs sign-in. ChatGPT shows account linking only with both. Verify the connection flow; do not imply private OAuth access from a working anonymous read.
 - Re-scan the actual deployed server and address portal findings. Editing `mcp.json` cannot repair server-owned tool metadata.
 
 These are descriptive hints, not permission grants or access controls. In MCP, `destructiveHint` is meaningful only for tools that are not read-only. See the [MCP annotation definitions](https://kotlin.sdk.modelcontextprotocol.io/kotlin-sdk-core/io.modelcontextprotocol.kotlin.sdk.types/-tool-annotations/index.html) and [OpenAI plugin reference](https://developers.openai.com/plugins/reference).
 
 No server source is modified by this repository change.
+
+## OAuth Client
+
+The package uses `mixed` authentication with a preregistered public client instead of Dynamic Client Registration:
+
+| Setting | Value |
+| --- | --- |
+| Client mode | `provided` |
+| Client ID | `nurok-chatgpt-prod` |
+| Token endpoint auth method | `none` |
+| Base scopes | `kb:read` |
+
+Before connecting, register this client in the Nurok authorization server with the exact callback URI shown by the portal connection flow.
+
+After uploading a new version, inspect the saved MCP settings before selecting **Connect**. They must show the provided client and no client-secret field. Uploading a ZIP may not replace a connection's earlier registration settings.
 
 ## Device Acceptance And Demo
 

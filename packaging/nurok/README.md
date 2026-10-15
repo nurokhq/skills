@@ -34,7 +34,7 @@ The ignored `dist/` directory receives:
 - `nurok-0.1.0.zip.sha256`: archive checksum.
 - `nurok-0.1.0.build.json`: source commit, dirty-state flag, and per-file hashes.
 
-The builder checks every archive byte against its canonical input. Stable ordering, timestamps, and modes make repeated builds with the same inputs, version, and compression runtime reproducible. The public package rejects local MCP commands, inline credentials, private app bindings, and lifecycle hooks.
+The builder checks every archive byte against its canonical input. Stable ordering, timestamps, and modes make repeated builds with the same inputs, version, and compression runtime reproducible. The public package rejects local MCP commands, inline credentials, auth settings other than the provided public client, private app bindings, and lifecycle hooks.
 
 ## Automatic GitHub Releases
 
@@ -48,7 +48,13 @@ The release job alone uses `GITHUB_TOKEN` with `contents: write`. No additional 
 
 ## Connection And Cross-Device Behavior
 
-The packaged endpoint is `https://mcp.nurok.ai/mcp` over Streamable HTTP. Anonymous public reads are supported. Private access must use whatever authenticated connection the service and host actually support; CLI login does not transfer to mobile or establish an MCP identity. No credential or OAuth endpoint is invented in the package.
+The packaged endpoint is `https://mcp.nurok.ai/mcp` over Streamable HTTP. Its `extensions.com.openai.auth` block declares `mixed` authentication:
+
+- **Anonymous public reads** work without connecting an account.
+- **Private access** uses OAuth through the preregistered public client `nurok-chatgpt-prod`, with `tokenEndpointAuthMethod: none` and the `kb:read` scope.
+- **Each user** signs in to Nurok and authorizes independently. The client ID identifies the plugin, not a user.
+
+Endpoints come from OAuth discovery; the package carries no authorization or token URL overrides, client secret, or user token. The client ID must match the curated client registered in the Nurok authorization server, and the builder rejects any other auth block. CLI login does not transfer to mobile or establish an MCP identity.
 
 The bundled skill defaults to MCP. Explicit CLI reads remain an optional path for a host that has an installed CLI and shell. A missing remote connection on mobile is reported as a connection prerequisite, not a request to install local software.
 
