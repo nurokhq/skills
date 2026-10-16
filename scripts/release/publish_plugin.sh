@@ -32,6 +32,23 @@ if [[ -n "$previous_tag" ]]; then
   # check below validate it before deciding whether publication can continue.
   if [[ "$previous_tag" != "$tag" ]] && git diff --quiet "$previous_tag" HEAD -- \
     'plugins/nurok-kb/skills/**' packaging/nurok scripts/release LICENSE; then
+    # An earlier interrupted run may have left a draft that unchanged inputs
+    # would otherwise abandon; stop loudly instead of reporting success.
+    drafts=$(gh release list --limit 100 --json tagName,isDraft | python3 -c '
+import json
+import sys
+
+releases = json.load(sys.stdin)
+print(" ".join(
+    release["tagName"] for release in releases
+    if release["isDraft"] and release["tagName"].startswith("nurok-v")
+))
+')
+    if [[ -n "$drafts" ]]; then
+      echo "Unpublished plugin draft(s) need recovery: $drafts" >&2
+      echo "Rerun the release job that created each draft, or delete the draft." >&2
+      exit 1
+    fi
     echo "Plugin inputs are unchanged since $previous_tag."
     exit 0
   fi

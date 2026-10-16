@@ -243,6 +243,8 @@ from pathlib import Path
 args = sys.argv[1:]
 with Path(os.environ["FAKE_GH_LOG"]).open("a") as stream:
     stream.write(json.dumps(args) + "\n")
+if args[:2] == ["release", "list"]:
+    print(os.environ.get("FAKE_RELEASE_LIST", "[]"))
 if args[:2] == ["release", "view"]:
     state = os.environ.get("FAKE_RELEASE_STATE")
     if not state:
@@ -309,13 +311,42 @@ if args[:2] == ["release", "view"]:
         self.assertIn(environment["GITHUB_SHA"], calls[1])
         self.assertIn("--draft=false", calls[3])
 
-    def test_unchanged_release_does_not_call_github(self) -> None:
+    def test_unchanged_release_only_checks_for_drafts(self) -> None:
         environment = self.prepare_publication()
         self.git("tag", "nurok-v0.1.22")
         result = self.publish(environment)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("unchanged", result.stdout)
-        self.assertFalse(Path(environment["FAKE_GH_LOG"]).exists())
+        self.assertEqual([call[1] for call in self.gh_calls(environment)], ["list"])
+
+    def test_unchanged_inputs_do_not_abandon_an_earlier_draft(self) -> None:
+        environment = self.prepare_publication()
+        self.git("tag", "nurok-v0.1.22")
+        environment["FAKE_RELEASE_LIST"] = json.dumps(
+            [
+                {"tagName": "nurok-v0.1.22", "isDraft": True},
+                {"tagName": "other-v1.0.0", "isDraft": True},
+            ]
+        )
+        result = self.publish(environment)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("nurok-v0.1.22", result.stderr)
+        self.assertNotIn("other-v1.0.0", result.stderr)
+        self.assertNotIn("unchanged", result.stdout)
+        self.assertEqual([call[1] for call in self.gh_calls(environment)], ["list"])
+
+    def test_published_releases_do_not_block_unchanged_inputs(self) -> None:
+        environment = self.prepare_publication()
+        self.git("tag", "nurok-v0.1.22")
+        environment["FAKE_RELEASE_LIST"] = json.dumps(
+            [
+                {"tagName": "nurok-v0.1.22", "isDraft": False},
+                {"tagName": "other-v1.0.0", "isDraft": True},
+            ]
+        )
+        result = self.publish(environment)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("unchanged", result.stdout)
 
     def test_docs_push_catches_unreleased_skill_change(self) -> None:
         self.git("tag", "nurok-v0.1.22")
@@ -333,7 +364,7 @@ if args[:2] == ["release", "view"]:
         environment = self.prepare_publication()
         result = self.publish(environment)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertFalse(Path(environment["FAKE_GH_LOG"]).exists())
+        self.assertEqual([call[1] for call in self.gh_calls(environment)], ["list"])
 
     def test_old_run_cannot_replace_a_newer_release(self) -> None:
         self.commit_change("plugins/nurok-kb/skills/nurok-kb/SKILL.md")
