@@ -15,6 +15,12 @@ Nurok Skills packages repeatable workflows for capturing, reading, and managing 
 
 Each plugin is standalone and declares no dependency on either of the others. Install only the capture, read-only, or management capabilities needed for a task; cross-skill handoffs are conditional.
 
+## Nurok For ChatGPT And Codex
+
+The [Nurok public-plugin bundle](packaging/nurok/README.md) combines the canonical read skill with remote MCP for supported mobile, web, Mac, Windows, and Codex hosts. Its core read workflow needs no local CLI or Python. Capture and management remain separate capabilities and are not included in this first read-only public release.
+
+CI builds a complete ZIP and publishes changed bundles to [GitHub Releases](https://github.com/nurokhq/skills/releases) after checks pass on `main`. GitHub publication does not mean the plugin is already in the public directory; see the [submission record](packaging/nurok/submission.md) for server, publisher, and device-verification gaps. Existing independently installable plugins remain available below.
+
 ## Install
 
 ### Ask An Agent
@@ -126,7 +132,7 @@ hermes skills update nurok-kb-capture
 
 ## Prerequisites
 
-The read-only skill can use either the Nurok CLI or bundled Nurok MCP read tools. CLI installation is optional for MCP-only reads. The management skill requires Nurok CLI 0.2.0 or later and Python 3.9 or later for its supplemental audit:
+The read-only skill can use either the Nurok CLI or bundled Nurok MCP read tools. Remote MCP is the default; CLI installation is optional for MCP-only reads and CLI is used only when explicitly requested. The management skill requires Nurok CLI 0.2.0 or later and Python 3.9 or later for its supplemental audit:
 
 ```bash
 curl -fsSL https://static.nurok.ai/cli/install.sh | bash
@@ -145,6 +151,8 @@ The `nurok-kb` plugin does not change remote state. The management plugin can pu
 - `plugins/nurok-kb-capture/` contains the source-capture plugin and skill.
 - `.agents/plugins/marketplace.json` publishes the Codex marketplace entries.
 - `.claude-plugin/marketplace.json` publishes the Claude Code marketplace entries.
+- `packaging/nurok/` contains the public-plugin template, remote MCP config, and submission materials.
+- `scripts/release/` builds and publishes verified GitHub release artifacts.
 - `tests/` contains repository-only tests that are not installed with a skill.
 - `scripts/ci/` contains repository validation and DCO checks.
 
