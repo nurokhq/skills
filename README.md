@@ -17,7 +17,7 @@ Each plugin is standalone and declares no dependency on either of the others. In
 
 ## Nurok For ChatGPT And Codex
 
-The Nurok plugin for ChatGPT and Codex combines the canonical `nurok-kb` read skill from this repository with remote MCP for supported mobile, web, Mac, Windows, and Codex hosts. It is packaged and submitted separately and is distributed through the plugin directory, not from this repository. Capture and management remain separate capabilities. The independently installable plugins below remain available.
+The Nurok plugin for ChatGPT and Codex combines the canonical `nurok-kb` read skill from this repository with remote MCP for supported mobile, web, Mac, Windows, and Codex hosts. It is packaged and submitted to the plugin directory separately and is not distributed from this repository. Capture and management remain separate capabilities. The independently installable plugins below remain available.
 
 ## Install
 
