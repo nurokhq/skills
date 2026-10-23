@@ -7,8 +7,7 @@ This repository publishes portable Nurok Agent Skills through independent Codex 
 - `.agents/plugins/marketplace.json` defines the repository's Codex marketplace.
 - `.claude-plugin/marketplace.json` defines the repository's Claude Code marketplace.
 - `plugins/<plugin>/` contains matching Codex and Claude manifests plus its canonical distributable skills.
-- `packaging/nurok/` owns the public read-only release template. Its remote MCP workflow must not require local CLI, Python, shell, or credentials. Copy canonical skills only into ignored build output.
-- `scripts/release/` builds and publishes GitHub artifacts; this does not publish to the OpenAI directory.
+- The Nurok ChatGPT/Codex plugin is packaged downstream from `plugins/nurok-kb/skills/nurok-kb/`. Keep plugin templates, review cases, submission records, and release tooling out of this public repository.
 - `tests/` contains repository-only tests; do not package tests inside skills.
 - `scripts/ci/` contains repository validation and DCO checks.
 
@@ -39,9 +38,8 @@ When changing `nurok-kb-manage`, verify documented commands against the supporte
 uv sync --locked
 uv run python scripts/ci/validate_repository.py
 uv run python scripts/ci/verify_skill_distribution.py
-uv run python scripts/release/build_plugin.py --version 0.1.0
-uv run ruff format --check plugins packaging tests scripts
-uv run ruff check plugins packaging tests scripts
+uv run ruff format --check plugins tests scripts
+uv run ruff check plugins tests scripts
 uv run python -m unittest discover -s tests -p "test_*.py" -v
 ```
 

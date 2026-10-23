@@ -38,9 +38,8 @@ Install the locked development environment and run the same checks used by CI:
 uv sync --locked
 uv run python scripts/ci/validate_repository.py
 uv run python scripts/ci/verify_skill_distribution.py
-uv run python scripts/release/build_plugin.py --version 0.1.0
-uv run ruff format --check plugins packaging tests scripts
-uv run ruff check plugins packaging tests scripts
+uv run ruff format --check plugins tests scripts
+uv run ruff check plugins tests scripts
 uv run python -m unittest discover -s tests -p "test_*.py" -v
 npx --yes markdownlint-cli2 "**/*.md"
 lychee --offline --config lychee.toml .
@@ -51,7 +50,7 @@ Also run the bundled supplemental audit and relevant Nurok CLI validation agains
 
 When preparing a release, pass the merge base with `--base-ref` so every changed canonical skill requires a plugin version increase. Pass each maintained portable installation root with `--portable-root` and each Codex or Claude plugin cache root with `--plugin-cache-root`. Use a repeated `--skill` argument when an installation intentionally contains only a subset. The verification must report byte-identical copies before release.
 
-For the public Nurok bundle, stage new files before building and follow the [release guide](packaging/nurok/README.md). Keep business skills in their canonical directories and record public-submission gaps separately from build verification.
+The Nurok plugin for ChatGPT and Codex is packaged downstream from the canonical `nurok-kb` skill. Keep that skill host-agnostic and free of plugin submission details; packaging changes do not belong in this repository.
 
 ## Pull Requests
 

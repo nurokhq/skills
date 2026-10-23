@@ -58,70 +58,18 @@ jobs:
         if: github.event_name == 'pull_request'
         run: uv run python scripts/ci/verify_skill_distribution.py --base-ref "${{ github.event.pull_request.base.sha }}"
       - name: Check Formatting
-        run: uv run ruff format --check plugins packaging tests scripts
+        run: uv run ruff format --check plugins tests scripts
       - name: Lint
-        run: uv run ruff check plugins packaging tests scripts
+        run: uv run ruff check plugins tests scripts
       - name: Test
         run: uv run python -m unittest discover -s tests -p "test_*.py" -v
 
-  package:
-    name: Plugin Package
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - name: Check Out
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - name: Select Version
-        id: version
-        env:
-          RUN_NUMBER: ${{ github.run_number }}
-        run: echo "version=0.1.$RUN_NUMBER" >> "$GITHUB_OUTPUT"
-      - name: Build And Verify Archive
-        env:
-          PLUGIN_VERSION: ${{ steps.version.outputs.version }}
-        run: python3 scripts/release/build_plugin.py --version "$PLUGIN_VERSION"
-      - name: Upload Reviewable Package
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: nurok-plugin
-          path: dist/nurok-*
-          if-no-files-found: error
-
   ci-ok:
     name: CI OK
-    needs: [docs, repository, package]
+    needs: [docs, repository]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Verify Jobs
-        run: 'if [ "${{ needs.docs.result }}" != "success" ] || [ "${{ needs.repository.result }}" != "success" ] || [ "${{ needs.package.result }}" != "success" ]; then echo "A required job did not succeed"; exit 1; fi'
+        run: 'if [ "${{ needs.docs.result }}" != "success" ] || [ "${{ needs.repository.result }}" != "success" ]; then echo "A required job did not succeed"; exit 1; fi'
 
-  release:
-    name: Publish GitHub Release
-    needs: [ci-ok, package]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    concurrency:
-      group: nurok-plugin-release
-      cancel-in-progress: false
-    steps:
-      - name: Check Out
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Download Verified Package
-        uses: actions/download-artifact@v8.0.2
-        with:
-          name: nurok-plugin
-          path: dist
-      - name: Publish Changed Plugin
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PLUGIN_VERSION: ${{ needs.package.outputs.version }}
-        run: bash scripts/release/publish_plugin.sh
