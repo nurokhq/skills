@@ -17,9 +17,7 @@ Each plugin is standalone and declares no dependency on either of the others. In
 
 ## Nurok For ChatGPT And Codex
 
-The [Nurok public-plugin bundle](packaging/nurok/README.md) combines the canonical read skill with remote MCP for supported mobile, web, Mac, Windows, and Codex hosts. Its core read workflow needs no local CLI or Python. Capture and management remain separate capabilities and are not included in this first read-only public release.
-
-CI builds a complete ZIP and publishes changed bundles to [GitHub Releases](https://github.com/nurokhq/skills/releases) after checks pass on `main`. GitHub publication does not mean the plugin is already in the public directory; see the [submission record](packaging/nurok/submission.md) for server, publisher, and device-verification gaps. Existing independently installable plugins remain available below.
+The Nurok plugin for ChatGPT and Codex combines the canonical `nurok-kb` read skill from this repository with remote MCP for supported mobile, web, Mac, Windows, and Codex hosts. It is packaged and submitted separately and is distributed through the plugin directory, not from this repository. Capture and management remain separate capabilities. The independently installable plugins below remain available.
 
 ## Install
 
@@ -151,8 +149,6 @@ The `nurok-kb` plugin does not change remote state. The management plugin can pu
 - `plugins/nurok-kb-capture/` contains the source-capture plugin and skill.
 - `.agents/plugins/marketplace.json` publishes the Codex marketplace entries.
 - `.claude-plugin/marketplace.json` publishes the Claude Code marketplace entries.
-- `packaging/nurok/` contains the public-plugin template, remote MCP config, and submission materials.
-- `scripts/release/` builds and publishes verified GitHub release artifacts.
 - `tests/` contains repository-only tests that are not installed with a skill.
 - `scripts/ci/` contains repository validation and DCO checks.
 
