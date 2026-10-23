@@ -67,12 +67,12 @@ Provenance for a retrieved Section:
 {"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"provenance","section_id":"<returned-section-id>"}
 ```
 
-Section content when `kb_section_get` omitted it, with optional zero-based byte `offset` and positive byte `length` for a bounded read:
+Section content when `kb_section_get` omitted it. `offset` and `length` are optional; set them to the zero-based byte offset and positive byte count of a bounded read:
 
 ```json
-{"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"section_content","section_id":"<returned-section-id>","ext":"md","offset":0,"length":<byte-count>}
+{"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"section_content","section_id":"<returned-section-id>","ext":"md","offset":0,"length":65536}
 ```
 
-Read Section provenance directly when its identity is known; fetching the Descriptor first is not required to read provenance. Read the returned inline artifact or exact resource URI before classifying evidence. Before disclosing any Source identity from that provenance, read the Descriptor at the same revision, or use verified returned Source-registry state, to resolve Source visibility as [the provenance workflow](provenance.md) requires. If visibility cannot be resolved, disclose only the opaque Source ID and mark the evidence incomplete.
+Read Section provenance directly when its identity is known; fetching the Descriptor first is not required to read provenance. Read the returned inline artifact or exact resource URI before classifying evidence. Before disclosing any Source identity from that provenance, resolve its visibility at the same revision from the `visibility` returned by `kb_source_get` or `kb_sources_list`, or from the Descriptor when those reads are unavailable, as [the provenance workflow](provenance.md) requires. Any explicit private marker wins. If visibility cannot be resolved, disclose only the opaque Source ID and mark the evidence incomplete.
 
 When the runtime exposes the `kb_artifact` input schema, follow it; it overrides these examples. Use these argument shapes only when the host renders the schema as `unknown` or hides its fields. On `validation.failed`, compare the rejected arguments with the schema and these examples, correct a confirmed mismatch, and retry once at the same KB and revision. A parameter-validation error alone does not establish missing content, missing provenance, or failed authorization. If the corrected read still fails, report the actual error and mark the evidence incomplete.
