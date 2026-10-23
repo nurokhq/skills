@@ -50,3 +50,23 @@ Use available metadata, excerpt, and full-content modes according to the task. A
 Use `kb_artifact` for a structured Descriptor or one published raw artifact at the selected revision. Use `kb_sources_list` and `kb_source_get` only when needed to resolve a Source used by the answer. Prefer the returned `web_url` for KB navigation and returned public Source URIs for factual citations. Respect explicit private Source markers even inside a public KB.
 
 For answers or syntheses that make material claims, complete [the provenance workflow](provenance.md) for every Section used. Keep the KB and revision pinned across Section, provenance, and Source reads; report missing evidence instead of inventing citations.
+
+## Read Descriptor And Provenance Artifacts
+
+For `kb_artifact`, the structured Descriptor uses `kind: "openakb"`; `descriptor` is a response field, not an accepted `kind`. Section provenance uses `kind: "provenance"` with `section_id`. Replace the placeholders below with the canonical KB ID, pinned revision, and Section ID returned by earlier reads.
+
+Descriptor, when needed to resolve metadata:
+
+```json
+{"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"openakb"}
+```
+
+Provenance for a retrieved Section:
+
+```json
+{"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"provenance","section_id":"<returned-section-id>"}
+```
+
+Read Section provenance directly when its identity is known; fetching the Descriptor first is not required. Read the returned inline artifact or exact resource URI before classifying evidence.
+
+If the host renders the input schema as `unknown` or hides its fields, use these documented argument shapes for these two artifact kinds; follow any explicit runtime schema differences. On `validation.failed`, compare the rejected arguments with the schema and these examples, correct a confirmed mismatch, and retry once at the same KB and revision. A parameter-validation error alone does not establish missing provenance or failed authorization. If the corrected read still fails, report the actual error and mark the evidence incomplete.

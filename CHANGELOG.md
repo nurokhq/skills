@@ -27,6 +27,7 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 
 ### Fixed
 
+- Nurok KB 0.1.4 documents exact Descriptor and Section provenance artifact arguments, direct provenance reads, and bounded recovery from argument-validation errors.
 - Reject malformed SHA-256 values before treating missing local blobs as stamps-only references.
 - Preserve primary audit findings when comparison setup cannot load a descriptor.
 - Return structured audit findings for non-string Source types.
