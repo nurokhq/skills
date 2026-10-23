@@ -55,7 +55,7 @@ For answers or syntheses that make material claims, complete [the provenance wor
 
 For `kb_artifact`, the structured Descriptor uses `kind: "openakb"`; `descriptor` is a response field, not an accepted `kind`. Section provenance uses `kind: "provenance"` with `section_id`. Replace the placeholders below with the canonical KB ID, pinned revision, and Section ID returned by earlier reads.
 
-Descriptor, when needed to resolve metadata:
+Descriptor, when needed to resolve metadata or Source visibility:
 
 ```json
 {"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"openakb"}
@@ -67,6 +67,6 @@ Provenance for a retrieved Section:
 {"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"provenance","section_id":"<returned-section-id>"}
 ```
 
-Read Section provenance directly when its identity is known; fetching the Descriptor first is not required. Read the returned inline artifact or exact resource URI before classifying evidence.
+Read Section provenance directly when its identity is known; fetching the Descriptor first is not required to read provenance. Read the returned inline artifact or exact resource URI before classifying evidence. Before disclosing any Source identity from that provenance, read the Descriptor at the same revision, or use verified returned Source-registry state, to resolve Source visibility as [the provenance workflow](provenance.md) requires. If visibility cannot be resolved, disclose only the opaque Source ID and mark the evidence incomplete.
 
-If the host renders the input schema as `unknown` or hides its fields, use these documented argument shapes for these two artifact kinds; follow any explicit runtime schema differences. On `validation.failed`, compare the rejected arguments with the schema and these examples, correct a confirmed mismatch, and retry once at the same KB and revision. A parameter-validation error alone does not establish missing provenance or failed authorization. If the corrected read still fails, report the actual error and mark the evidence incomplete.
+When the runtime exposes the `kb_artifact` input schema, follow it; it overrides these examples. Use these argument shapes only when the host renders the schema as `unknown` or hides its fields. On `validation.failed`, compare the rejected arguments with the schema and these examples, correct a confirmed mismatch, and retry once at the same KB and revision. A parameter-validation error alone does not establish missing provenance or failed authorization. If the corrected read still fails, report the actual error and mark the evidence incomplete.
