@@ -45,15 +45,15 @@ For a topical or factual question, use `kb_search` with a focused query. Treat h
 
 For structure or an exhaustive survey, use `kb_sections_list` as the table of contents. Start with depth 1 or 2, inspect titles and descriptions, and recurse with `parent_id` as needed. When supported, use `kb_subtree_read` to retrieve a selected branch in descriptor order. Search results alone do not establish exhaustive coverage.
 
-Use available metadata, excerpt, and full-content modes according to the task. An excerpt is a literal slice, not the complete Section. When a tool returns inline content, use it. When `omitted_fields` indicates missing content and an exact `content_uri` is returned, read that resource if the host supports it. Otherwise use `kb_artifact` according to its current schema, using the verified Section ID and documented offset or length fields for bounded reads. Never invent a resource URI, artifact path, offset, or argument. Resource fallback must work without local filesystem access.
+Use available metadata, excerpt, and full-content modes according to the task. An excerpt is a literal slice, not the complete Section. When a tool returns inline content, use it. When `omitted_fields` indicates missing content and an exact `content_uri` is returned, read that resource if the host supports it. Otherwise read it with `kb_artifact` using the verified Section ID and the [Section content arguments](#read-artifacts), with `offset` and `length` for bounded reads. Never invent a resource URI, artifact path, offset, or argument. Resource fallback must work without local filesystem access.
 
 Use `kb_artifact` for a structured Descriptor or one published raw artifact at the selected revision. Use `kb_sources_list` and `kb_source_get` only when needed to resolve a Source used by the answer. Prefer the returned `web_url` for KB navigation and returned public Source URIs for factual citations. Respect explicit private Source markers even inside a public KB.
 
 For answers or syntheses that make material claims, complete [the provenance workflow](provenance.md) for every Section used. Keep the KB and revision pinned across Section, provenance, and Source reads; report missing evidence instead of inventing citations.
 
-## Read Descriptor And Provenance Artifacts
+## Read Artifacts
 
-For `kb_artifact`, the structured Descriptor uses `kind: "openakb"`; `descriptor` is a response field, not an accepted `kind`. Section provenance uses `kind: "provenance"` with `section_id`. Replace the placeholders below with the canonical KB ID, pinned revision, and Section ID returned by earlier reads.
+For `kb_artifact`, the structured Descriptor uses `kind: "openakb"`; `descriptor` is a response field, not an accepted `kind`. Section provenance uses `kind: "provenance"` with `section_id`. Section content uses `kind: "section_content"` with `section_id` and `ext: "md"`. Replace the placeholders below with the canonical KB ID, pinned revision, and Section ID returned by earlier reads.
 
 Descriptor, when needed to resolve metadata or Source visibility:
 
@@ -67,6 +67,12 @@ Provenance for a retrieved Section:
 {"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"provenance","section_id":"<returned-section-id>"}
 ```
 
+Section content when `kb_section_get` omitted it, with optional zero-based byte `offset` and positive byte `length` for a bounded read:
+
+```json
+{"kb_id":"<resolved-kb-id>","revision":"<pinned-revision>","kind":"section_content","section_id":"<returned-section-id>","ext":"md","offset":0,"length":<byte-count>}
+```
+
 Read Section provenance directly when its identity is known; fetching the Descriptor first is not required to read provenance. Read the returned inline artifact or exact resource URI before classifying evidence. Before disclosing any Source identity from that provenance, read the Descriptor at the same revision, or use verified returned Source-registry state, to resolve Source visibility as [the provenance workflow](provenance.md) requires. If visibility cannot be resolved, disclose only the opaque Source ID and mark the evidence incomplete.
 
-When the runtime exposes the `kb_artifact` input schema, follow it; it overrides these examples. Use these argument shapes only when the host renders the schema as `unknown` or hides its fields. On `validation.failed`, compare the rejected arguments with the schema and these examples, correct a confirmed mismatch, and retry once at the same KB and revision. A parameter-validation error alone does not establish missing provenance or failed authorization. If the corrected read still fails, report the actual error and mark the evidence incomplete.
+When the runtime exposes the `kb_artifact` input schema, follow it; it overrides these examples. Use these argument shapes only when the host renders the schema as `unknown` or hides its fields. On `validation.failed`, compare the rejected arguments with the schema and these examples, correct a confirmed mismatch, and retry once at the same KB and revision. A parameter-validation error alone does not establish missing content, missing provenance, or failed authorization. If the corrected read still fails, report the actual error and mark the evidence incomplete.

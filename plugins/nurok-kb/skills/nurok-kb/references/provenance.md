@@ -7,13 +7,13 @@ Use this workflow for answers, comparisons, and syntheses that make material cla
 Pin all reads that support one answer to the same canonical KB and revision. For every material Section used in the answer:
 
 1. Retrieve the Section content rather than relying on a search hit.
-2. Read the Section's provenance artifact at the pinned revision. With MCP, use the verified Section ID and the [artifact arguments](mcp.md#read-descriptor-and-provenance-artifacts). For resource or CLI reads, resolve the returned or Descriptor-declared `provenance_uri` without inventing a path.
+2. Read the Section's provenance artifact at the pinned revision. With MCP, use the verified Section ID and the [artifact arguments](mcp.md#read-artifacts). For resource or CLI reads, resolve the returned or Descriptor-declared `provenance_uri` without inventing a path.
 3. Resolve every material `source_id` to its published Source metadata. Treat a Source as public unless the retrieved Descriptor or verified returned Source-registry state explicitly marks it private; any explicit private marker wins. Never infer Source visibility from KB record visibility. Preserve a public Source's returned ID, type, URI, capture timestamp, and capture metadata. Key an explicitly private Source only by its opaque stable Source ID and non-identifying Section, block, range, and order mapping. If the required metadata cannot be resolved, record the missing link and classify the evidence as incomplete.
 4. Record the answer claim, KB, revision, Section, provenance entry, and Source as one evidence chain.
 
 With the CLI, use `nurok kb section get` for the Section and cited Source metadata. Use `nurok kb cat` at the same revision to read `openakb.json` or one returned provenance artifact when required. Owner Source-registry commands remain outside this skill's read boundary.
 
-With MCP, use `kb_section_get` and exact returned resource URIs for content. Follow the [artifact arguments and validation-error recovery](mcp.md#read-descriptor-and-provenance-artifacts) for Descriptor or provenance reads, and use `kb_sources_list` or `kb_source_get` when needed to resolve a Source used by the answer. Read [the MCP workflow](mcp.md) for the complete MCP boundary.
+With MCP, use `kb_section_get` and exact returned resource URIs for content. Follow the [artifact arguments and validation-error recovery](mcp.md#read-artifacts) for Descriptor or provenance reads, and use `kb_sources_list` or `kb_source_get` when needed to resolve a Source used by the answer. Read [the MCP workflow](mcp.md) for the complete MCP boundary.
 
 Do not read a raw capture merely to populate the compact provenance display. Read one only when the user requests evidence verification or when resolving a material conflict requires it, and only through an allowed read operation at the same revision.
 
