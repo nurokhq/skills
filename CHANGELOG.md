@@ -19,7 +19,7 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 
 ### Changed
 
-- Nurok KB 0.1.3 defaults to remote MCP; CLI reads require an explicit user request and an available shell. MCP guidance now follows the deployed discovery, search, subtree, and content-mode contracts.
+- Nurok KB defaults to remote MCP; CLI reads require an explicit user request and an available shell. MCP guidance now follows the deployed discovery, search, subtree, and content-mode contracts.
 
 ### Removed
 
@@ -27,6 +27,7 @@ All notable changes to Nurok Skills are documented here. The project follows [Ke
 
 ### Fixed
 
+- Nurok KB documents exact Descriptor, Section content, and Section provenance artifact arguments, direct provenance reads with Source-visibility resolution before disclosure, and bounded recovery from argument-validation errors.
 - Reject malformed SHA-256 values before treating missing local blobs as stamps-only references.
 - Preserve primary audit findings when comparison setup cannot load a descriptor.
 - Return structured audit findings for non-string Source types.
